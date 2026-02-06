@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import KeycloakLogin from "@/components/keycloak-login";
+
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -58,6 +60,9 @@ export default function Home() {
           >
             Documentation
           </a>
+        </div>
+        <div className="mt-6 w-full">
+          <KeycloakLogin />
         </div>
       </main>
     </div>
