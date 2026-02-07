@@ -11,7 +11,15 @@ import {
 
 type AuthState = "idle" | "loading" | "authenticated" | "unauthenticated" | "error";
 
-export default function KeycloakLogin() {
+type KeycloakLoginProps = {
+  primaryLabel?: string;
+  loadingLabel?: string;
+};
+
+export default function KeycloakLogin({
+  primaryLabel = "로그인하고 시작",
+  loadingLabel = "로그인 상태 확인 중...",
+}: KeycloakLoginProps) {
   const keycloak = getKeycloak();
   const [status, setStatus] = useState<AuthState>("idle");
   const [username, setUsername] = useState<string | null>(null);
@@ -60,15 +68,15 @@ export default function KeycloakLogin() {
   if (status === "authenticated") {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-zinc-600">
-          Signed in {username ? `as ${username}` : "successfully"}.
+        <p className="text-sm text-[#5c6c7e]">
+          {username ? `${username}님으로 로그인됨.` : "로그인 완료."}
         </p>
         <button
           type="button"
-          className="h-11 rounded-full border border-solid border-black/10 px-5 text-sm font-medium transition-colors hover:border-transparent hover:bg-black/5"
+          className="h-11 rounded-full border border-solid border-[#d7dde6] bg-white px-5 text-sm font-semibold text-[#2d4a6a] transition-colors hover:border-[#2d4a6a]/40 hover:bg-[#f2f6fb]"
           onClick={handleLogout}
         >
-          Sign out
+          로그아웃
         </button>
       </div>
     );
@@ -81,11 +89,11 @@ export default function KeycloakLogin() {
     <div className="flex flex-col gap-3">
       <button
         type="button"
-        className="h-11 rounded-full bg-black px-5 text-sm font-medium text-white transition-colors hover:bg-black/80 disabled:cursor-not-allowed disabled:bg-black/40"
+        className="h-11 rounded-full bg-[#355a7a] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2f4f6b] disabled:cursor-not-allowed disabled:bg-[#94a3b8]"
         onClick={handleLogin}
         disabled={!isReady || !isConfigured}
       >
-        {isReady ? "Sign in with Keycloak" : "Checking login status..."}
+        {isReady ? primaryLabel : loadingLabel}
       </button>
       {status === "error" ? (
         <div className="rounded-lg border border-dashed border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

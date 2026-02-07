@@ -14,31 +14,49 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 const HEADER_HEIGHT = 250;
 
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+  headerImage?: ReactElement;
+  headerBackgroundColor?: { dark: string; light: string };
+  headerHeight?: number;
 }>;
 
 export default function ParallaxScrollView({
   children,
   headerImage,
   headerBackgroundColor,
+  headerHeight,
 }: Props) {
   const backgroundColor = useThemeColor({}, 'background');
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollOffset(scrollRef);
+  const effectiveHeaderHeight = headerImage ? (headerHeight ?? HEADER_HEIGHT) : 0;
+
+  if (!headerImage) {
+    return (
+      <Animated.ScrollView
+        ref={scrollRef}
+        style={{ backgroundColor, flex: 1 }}
+        scrollEventThrottle={16}>
+        <ThemedView style={styles.content}>{children}</ThemedView>
+      </Animated.ScrollView>
+    );
+  }
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
           translateY: interpolate(
             scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+            [-effectiveHeaderHeight, 0, effectiveHeaderHeight],
+            [-effectiveHeaderHeight / 2, 0, effectiveHeaderHeight * 0.75]
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
+          scale: interpolate(
+            scrollOffset.value,
+            [-effectiveHeaderHeight, 0, effectiveHeaderHeight],
+            [2, 1, 1]
+          ),
         },
       ],
     };
@@ -52,7 +70,12 @@ export default function ParallaxScrollView({
       <Animated.View
         style={[
           styles.header,
-          { backgroundColor: headerBackgroundColor[colorScheme] },
+          {
+            backgroundColor: headerBackgroundColor
+              ? headerBackgroundColor[colorScheme]
+              : backgroundColor,
+            height: effectiveHeaderHeight,
+          },
           headerAnimatedStyle,
         ]}>
         {headerImage}

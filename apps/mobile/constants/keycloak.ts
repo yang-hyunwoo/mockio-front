@@ -1,5 +1,5 @@
 export const keycloakConfig = {
-  issuer: "http://10.0.2.2:8084/realms/mockio-realm",
+  issuer: "http://10.0.2.2:8084/realms/mockio-realm-dev",
   clientId: "mockio-client",
 };
 
