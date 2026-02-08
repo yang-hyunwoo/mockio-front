@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
   },
+  transpilePackages: ["@mockio/shared"],
 };
 
 export default nextConfig;
