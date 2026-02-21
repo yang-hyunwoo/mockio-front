@@ -1,6 +1,20 @@
+"use client";
+
 import KeycloakLogin from "@/components/keycloak-login";
+import { useEffect, useState } from "react";
+import { getKeycloak, subscribeAuth } from "@/lib/keycloak";
 
 export default function StartCard() {
+    const keycloak = getKeycloak();
+    const [authenticated, setAuthenticated] = useState(
+        keycloak.authenticated ?? false
+    );
+
+    useEffect(() => {
+        subscribeAuth(() => {
+            setAuthenticated(keycloak.authenticated ?? false);
+        });
+    }, []);
     return (
         <div
             id="start"
@@ -23,6 +37,7 @@ export default function StartCard() {
 
             <KeycloakLogin primaryLabel="면접 시작 (로그인)" />
 
+            {authenticated && (
             <div className="grid gap-3 text-xs text-[var(--brand-muted)]">
                 <div className="flex items-center justify-between rounded-full border border-[var(--surface-soft-border)] bg-[var(--surface-glass-strong)] px-4 py-2">
                     <span>연습 스트릭</span>
@@ -33,6 +48,7 @@ export default function StartCard() {
                     <span className="font-semibold text-[var(--brand-secondary)]">따뜻 + 직설</span>
                 </div>
             </div>
+            )}
         </div>
     );
 }

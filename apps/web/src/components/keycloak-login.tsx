@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   getKeycloak,
   getKeycloakRedirectUri,
-  getKeycloakSilentCheckSsoUri,
+  initKeycloak,
   isKeycloakConfigured,
 } from "@/lib/keycloak";
 
@@ -33,27 +33,23 @@ export default function KeycloakLogin({
     }
 
     setStatus("loading");
-    keycloak
-      .init({
-        onLoad: "check-sso",
-        pkceMethod: "S256",
-        checkLoginIframe: false,
-        silentCheckSsoRedirectUri: getKeycloakSilentCheckSsoUri(),
-      })
-      .then((authenticated) => {
-        if (!authenticated) {
-          setStatus("unauthenticated");
-          return;
-        }
 
-        setStatus("authenticated");
-        setUsername(keycloak.tokenParsed?.preferred_username ?? null);
-      })
-      .catch((error) => {
-        setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "Keycloak init failed.");
-      });
-  }, [keycloak]);
+    initKeycloak()
+        .then((authenticated) => {
+          if (!authenticated) {
+            setStatus("unauthenticated");
+            return;
+          }
+
+          const kc = getKeycloak();
+          setStatus("authenticated");
+          setUsername(kc.tokenParsed?.preferred_username ?? null);
+        })
+        .catch((error) => {
+          setStatus("error");
+          setErrorMessage(error instanceof Error ? error.message : "Keycloak init failed.");
+        });
+  }, []); // ✅ [keycloak] 말고 빈 배열
 
   const handleLogin = () => {
     setErrorMessage(null);

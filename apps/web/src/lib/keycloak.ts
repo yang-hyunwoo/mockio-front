@@ -34,3 +34,26 @@ export const getKeycloak = () => {
 
   return keycloakInstance;
 };
+
+let initPromise: Promise<boolean> | null = null;
+
+export const initKeycloak = () => {
+  const kc = getKeycloak();
+
+  if (!initPromise) {
+    initPromise = kc.init({
+      onLoad: "check-sso",
+      pkceMethod: "S256",
+      checkLoginIframe: false,
+      silentCheckSsoRedirectUri: getKeycloakSilentCheckSsoUri(),
+    });
+  }
+
+  return initPromise;
+};
+
+export const subscribeAuth = (callback: () => void) => {
+  const kc = getKeycloak();
+  kc.onAuthSuccess = callback;
+  kc.onAuthLogout = callback;
+};
