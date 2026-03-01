@@ -1,26 +1,11 @@
 const normalizeBaseUrl = (value?: string) => {
-  if (!value) {
-    return "";
-  }
+  if (!value) return "";
   return value.endsWith("/") ? value.slice(0, -1) : value;
 };
 
-const getEnv = () => {
-  if (typeof globalThis !== "undefined" && "process" in globalThis) {
-    const proc = (globalThis as { process?: { env?: Record<string, string> } }).process;
-    return proc?.env ?? {};
-  }
-  return {};
-};
-
-const env = getEnv();
-const rawBaseUrl =
-  env.NEXT_PUBLIC_API_URL ??
-  env.API_URL ??
-  env.EXPO_PUBLIC_API_URL ??
-  "";
-
-export const apiBaseUrl = normalizeBaseUrl(rawBaseUrl);
+export const apiBaseUrl = normalizeBaseUrl(
+    process.env.NEXT_PUBLIC_API_URL!
+);
 
 const version = "v1";
 
@@ -41,4 +26,5 @@ export const apiEndpoints = {
   aiPublic: `${apiBaseUrl}/ai/${version}/public`,
   notiPublic: `${apiBaseUrl}/noti/${version}/public`,
   faqPublic: `${apiBaseUrl}/faq/${version}/public`,
+  authPublic: `${apiBaseUrl}/auth/${version}/public`,
 };

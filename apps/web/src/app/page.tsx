@@ -7,6 +7,7 @@ import NoticeProfileSection from "@/components/home/NoticeProfileSection";
 import { getNotice } from "@/lib/home/notice";
 
 export default async function Home() {
+
   const notice = await getNotice();
 
   return (

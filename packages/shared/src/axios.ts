@@ -1,82 +1,41 @@
 "use client";
 
-import axios from "axios";
-
+import axios, { AxiosError } from "axios";
 import { apiBaseUrl } from "./api";
 
 export const api = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
+// (선택) 요청 로깅이 필요하면 여기서 찍기
 api.interceptors.request.use((config) => {
-  if (typeof window === "undefined") {
-    return config;
-  }
-
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
   return config;
 });
 
-const deleteCookie = (name: string) => {
-  if (typeof document === "undefined") {
-    return;
-  }
-  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-};
-
 api.interceptors.response.use(
-  (response) => {
-    if (typeof window !== "undefined") {
-      const newToken = response.headers["authorization"];
-      if (newToken) {
-        localStorage.setItem("accessToken", newToken);
-        document.cookie = `accessToken=${newToken}; path=/;`;
+    (response) => response,
+    (error: AxiosError<any>) => {
+      // 네트워크 오류
+      if (!error.response) {
+        // 필요하면 토스트/알림
+        // alert("서버에 연결할 수 없습니다. 잠시후 시도 해주세요.");
+        return Promise.reject(error);
       }
-    }
 
-    return response;
-  },
-  async (error: any) => {
-    if (typeof window === "undefined") {
+      const status = error.response.status;
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+
+      //  인증 만료/미인증 처리: 401
+      if (status === 401) {
+        if (currentPath !== "/login") {
+          // 2) 또는 "서버 주도 로그인"이면 바로 게이트웨이 로그인 시작
+          window.location.href = `http://localhost:9000/api/auth/v1/public/login`;
+        }
+      }
       return Promise.reject(error);
     }
-
-    const requestUrl = error.config?.url ?? "";
-    const currentPath = window.location.pathname;
-    if (currentPath === "/login") {
-      return Promise.reject(error);
-    }
-
-    if (
-      error?.response?.data?.code === "SC_ERR400" ||
-      error?.response?.data?.code === "SC_ERR401" ||
-      error?.response?.data?.code === "SC_ERR402" ||
-      error?.response?.data?.code === "SC_ERR404"
-    ) {
-      localStorage.removeItem("accessToken");
-      deleteCookie("accessToken");
-      deleteCookie("refresh-token");
-      deleteCookie("isAutoLogin");
-    }
-
-    if (requestUrl.includes("/user/me")) {
-      return Promise.reject(error);
-    }
-
-    if (error?.message === "Network Error") {
-      alert("서버에 연결할 수 없습니다. 잠시후 시도 해주세요.");
-    }
-
-    if (error.response?.data?.errCode === "ERR_004") {
-      alert("로그인 정보가 없습니다\n로그인 페이지로 이동합니다.");
-      window.location.href = `/login?redirectTo=${currentPath}`;
-    }
-
-    return Promise.reject(error);
-  }
 );
