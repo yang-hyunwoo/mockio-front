@@ -19,6 +19,7 @@ export const apiEndpoints = {
   noti: `${apiBaseUrl}/noti/${version}`,
   inquiry: `${apiBaseUrl}/inquiry/${version}`,
   faq: `${apiBaseUrl}/faq/${version}`,
+  interview: `${apiBaseUrl}/interview/${version}`,
 
   userPublic: `${apiBaseUrl}/users/${version}/public`,
   notificationPublic: `${apiBaseUrl}/notification/${version}/public`,

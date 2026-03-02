@@ -3,6 +3,11 @@
 import axios, { AxiosError } from "axios";
 import { apiBaseUrl } from "./api";
 
+const AUTH_PATH_PREFIXES = [
+    "/api/auth/v1/public",
+    "/.well-known",
+];
+
 export const api = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
@@ -33,9 +38,24 @@ api.interceptors.response.use(
       if (status === 401) {
         if (currentPath !== "/login") {
           // 2) 또는 "서버 주도 로그인"이면 바로 게이트웨이 로그인 시작
-          window.location.href = `http://localhost:9000/api/auth/v1/public/login`;
+            const reqUrl = error.config?.url;
+            if (!isAuthPath(reqUrl) && currentPath !== "/login") {
+                window.location.href = `http://localhost:9000/api/auth/v1/public/login`;
+            }
         }
       }
       return Promise.reject(error);
     }
 );
+
+
+
+function isAuthPath(url?: string) {
+    if (!url) return false;
+    try {
+        const u = new URL(url, window.location.origin);
+        return AUTH_PATH_PREFIXES.some((p) => u.pathname.startsWith(p));
+    } catch {
+        return AUTH_PATH_PREFIXES.some((p) => url.startsWith(p));
+    }
+}

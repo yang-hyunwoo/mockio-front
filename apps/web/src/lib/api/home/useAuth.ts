@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { validateSession } from "@/lib/home/authApi";
+import { validateSession } from "@/lib/api/home/authApi";
 import { SessionValidateResponse } from "@mockio/shared/src/api/home/SessionValidateResponse";
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
