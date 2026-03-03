@@ -25,10 +25,7 @@ export function ProfileCard() {
         interviewListApi()
             .then((res) => {
                 if (cancelled) return
-
                 const payload = (res as any)?.data ?? res
-                console.log("interviews:", payload)
-
                 setInterviews(payload)
             })
             .catch((e) => {
@@ -36,15 +33,13 @@ export function ProfileCard() {
                 console.error(e)
                 setInterviews([])
             })
-
         return () => {
             cancelled = true
         }
     }, [isAuthed])
 
     return (
-        <div
-            id="profile"
+        <div id="profile"
             className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass-strong)] p-6 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
         >
             <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">

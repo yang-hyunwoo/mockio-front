@@ -12,7 +12,7 @@ export default function InterviewCarousel({ interviews, autoplayMs = 5000 }: Pro
     const items = useMemo(() => interviews ?? [], [interviews])
     const [index, setIndex] = useState(0)
 
-    // ✅ autoplay 토글 상태(버튼으로 제어)
+    // autoplay 토글 상태(버튼으로 제어)
     const [isPlaying, setIsPlaying] = useState(true)
     const pausedRef = useRef(false)
 
@@ -30,7 +30,7 @@ export default function InterviewCarousel({ interviews, autoplayMs = 5000 }: Pro
     const prev = () => goTo(index - 1)
     const next = () => goTo(index + 1)
 
-    // ✅ autoplay (isPlaying이 true일 때만)
+    // autoplay (isPlaying이 true일 때만)
     useEffect(() => {
         if (!items.length) return
         if (!isPlaying) return
@@ -140,7 +140,7 @@ export default function InterviewCarousel({ interviews, autoplayMs = 5000 }: Pro
                     </div>
                 </div>
 
-                {/* ✅ 아래 컨트롤 바: 버튼 겹침 제거 + 재생/정지 추가 */}
+                {/* 아래 컨트롤 바: 버튼 겹침 제거 + 재생/정지 추가 */}
                 <div className="absolute bottom-3 left-0 right-0 z-20 flex items-center justify-between px-3 pointer-events-none">
                     <button
                         type="button"
@@ -165,7 +165,7 @@ export default function InterviewCarousel({ interviews, autoplayMs = 5000 }: Pro
                         <ChevronLeft className="h-5 w-5 text-[var(--text-primary)]" />
                     </button>
 
-                    {/* ✅ Play/Pause 토글 */}
+                    {/*  Play/Pause 토글 */}
                     <button
                         type="button"
                         aria-label={isPlaying ? "일시정지" : "재생"}
@@ -254,11 +254,10 @@ function Card({ item }: { item: Interview }) {
             </p>
 
             <div className="mt-3 w-full h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                <div
-                    className="h-full transition-all"
+                <div className="h-full transition-all"
                     style={{
                         width: `${progress}%`,
-                        backgroundColor: "var(--brand, #3b82f6)", // ✅ --brand 없으면 파란색으로 fallback
+                        backgroundColor: "var(--brand, #3b82f6)", // --brand 없으면 파란색으로 fallback
                     }}
                 />
             </div>

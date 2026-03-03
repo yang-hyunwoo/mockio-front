@@ -9,8 +9,7 @@ type NoticeCardProps = {
 
 export function NoticeCard({ notice }: NoticeCardProps) {
   return (
-    <div
-      id="notice"
+    <div id="notice"
       className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass-strong)] p-6 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
     >
       <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">

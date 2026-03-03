@@ -10,7 +10,6 @@ type AuthState = "loading" | "authenticated" | "unauthenticated";
 
 export default function StartCard() {
     const { authState, username } = useAuth();
-
     const [pref, setPref] = useState<Preference | null>(null);
     const [prefLoading, setPrefLoading] = useState(false);
     const [prefError, setPrefError] = useState<string | null>(null);
@@ -91,18 +90,18 @@ export default function StartCard() {
                 )}
             </div>
             {isAuthed && (
-                <div className="grid gap-3 text-xs text-[var(--brand-muted)]">
+                <div className="grid gap-3 text-xs text-(--brand-muted)">
                     <div
-                        className="flex items-center justify-between rounded-full border border-[var(--surface-soft-border)] bg-[var(--surface-glass-strong)] px-4 py-2">
+                        className="flex items-center justify-between rounded-full border border-(--surface-soft-border) bg-(--surface-glass-strong) px-4 py-2">
                         <span>면접 유형 (난이도)</span>
-                        <span className="font-semibold text-[var(--brand-secondary)]">
+                        <span className="font-semibold text-(--brand-secondary)">
                             {prefLoading ? "불러오는 중..." : prefError ? "불러오기 실패" : pref ? `${pref.trackLabel} (${pref.difficultyLabel})` : "-"}
                         </span>
                     </div>
                     <div
-                        className="flex items-center justify-between rounded-full border border-[var(--surface-soft-border)] bg-[var(--surface-glass-strong)] px-4 py-2">
+                        className="flex items-center justify-between rounded-full border border-(--surface-soft-border) bg-(--surface-glass-strong) px-4 py-2">
                         <span>피드백 스타일</span>
-                        <span className="font-semibold text-[var(--brand-secondary)]">
+                        <span className="font-semibold text-(--brand-secondary)">
                               {prefLoading ? "불러오는 중..." : prefError ? "불러오기 실패" : pref?.feedbackStyleLabel ?? "-"}
                         </span>
                     </div>

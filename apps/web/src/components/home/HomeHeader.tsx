@@ -1,26 +1,35 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomeHeader() {
     return (
         <header className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-6">
                 <div>
-                    <Image src="/branding/mockio-text-logo.png" alt="Mockio" width={120} height={24}/>
+                    <Link href="/" className="inline-flex items-center">
+                        <Image
+                            src="/branding/mockio-text-logo.png"
+                            alt="Mockio"
+                            width={120}
+                            height={24}
+                            priority
+                        />
+                    </Link>
                 </div>
 
                 <nav className="hidden items-center gap-5 text-sm font-medium lg:flex">
-                    <a href="#notice"
-                       className="text-[var(--brand-muted)]
-                                   transition-colors hover:text-[var(--text-primary)]"
+                    <Link
+                        href="/notice"
+                        className="text-(--brand-muted) transition-colors hover:text-foreground"
                     >
                         공지사항
-                    </a>
+                    </Link>
 
                     <div className="relative group">
                         <button type="button"
                                 className="inline-flex items-center
-                                gap-2 text-[var(--brand-muted)]
-                                transition-colors hover:text-[var(--text-primary)]"
+                                gap-2 text-(--brand-muted)
+                                transition-colors hover:text-foreground"
                         >
                             내 정보
                             <span className="text-[10px]
@@ -30,7 +39,7 @@ export default function HomeHeader() {
                         </button>
 
                         <div className="absolute left-0 top-full hidden pt-3 z-50 group-hover:block">
-                            <div className="min-w-[190px]
+                            <div className="min-w-47.5
                                     overflow-hidden
                                     rounded-2xl
                                     border border-white/30
@@ -77,12 +86,12 @@ export default function HomeHeader() {
                                h-10
                                items-center
                                rounded-full
-                               border border-[var(--border-soft)]
+                               border border-(--border-soft)
                                px-4
                                text-sm
-                               font-medium text-[var(--brand-secondary)]
-                               transition-colors hover:border-[var(--brand-secondary)]
-                               hover:bg-[var(--surface-glass)]"
+                               font-medium text-(--brand-secondary)
+                               transition-colors hover:border-(--brand-secondary)
+                               hover:bg-(--surface-glass)"
                 >
                     게스트 미리보기
                 </a>
@@ -91,13 +100,13 @@ export default function HomeHeader() {
                                h-10
                                items-center
                                rounded-full
-                               bg-[var(--brand-primary)]
+                               bg-(--brand-primary)
                                px-4
                                text-sm
                                font-semibold
                                text-white
                                transition-colors
-                               hover:bg-[var(--brand-primary-hover)]"
+                               hover:bg-(--brand-primary-hover)"
                 >
                     면접 시작
                 </a>
