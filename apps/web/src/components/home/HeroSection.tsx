@@ -1,3 +1,5 @@
+import Button from "@/components/Common/Button";
+
 export default function HeroSection() {
     return (
         <div className="flex flex-col gap-8">
@@ -19,11 +21,9 @@ export default function HeroSection() {
                 >
                     질문 미리보기
                 </a>
-                <button type="button"
-                    className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-soft)] px-6 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
-                >
+                <Button variant="outline" size="lg" pill>
                     진행 방식 보기
-                </button>
+                </Button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">

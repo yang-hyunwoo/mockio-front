@@ -1,12 +1,11 @@
 
 import { noticeDetailApi } from "@/lib/api/notice/noticeDetailApi"
-export default async function NoticeDetailPage({params,}: {
+export default async function NoticeDetailPage({params}: {
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
 
     const notice = await noticeDetailApi(id)
-    console.log(notice)
     if (!notice) {
         return (
             <div className="mx-auto max-w-5xl px-4 pt-10">

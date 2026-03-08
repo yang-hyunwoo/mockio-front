@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Button from "@/components/Common/Button";
 
 export default function HomeHeader() {
     return (
@@ -26,17 +27,14 @@ export default function HomeHeader() {
                     </Link>
 
                     <div className="relative group">
-                        <button type="button"
-                                className="inline-flex items-center
-                                gap-2 text-(--brand-muted)
-                                transition-colors hover:text-foreground"
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="px-0 h-auto font-medium"
+                            rightIcon={<span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">▾</span>}
                         >
                             내 정보
-                            <span className="text-[10px]
-                            opacity-70
-                            transition-transform
-                            group-hover:rotate-180">▾</span>
-                        </button>
+                        </Button>
 
                         <div className="absolute left-0 top-full hidden pt-3 z-50 group-hover:block">
                             <div className="min-w-47.5
@@ -95,8 +93,9 @@ export default function HomeHeader() {
                 >
                     게스트 미리보기
                 </a>
-                <a href="#start"
-                   className="inline-flex
+                <Link
+                    href="/interview"
+                    className="inline-flex
                                h-10
                                items-center
                                rounded-full
@@ -109,7 +108,8 @@ export default function HomeHeader() {
                                hover:bg-(--brand-primary-hover)"
                 >
                     면접 시작
-                </a>
+                </Link>
+
             </div>
         </header>
     );
