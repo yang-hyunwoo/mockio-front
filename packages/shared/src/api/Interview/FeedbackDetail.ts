@@ -1,4 +1,4 @@
-type FeedbackStatus = "PENDING" | "SUCCEEDED" | "FAILED"
+type FeedbackStatus = "PENDING" | "SUCCEEDED" | "FAILED" | "SKIPPED"
 
 export interface FeedbackResponse  {
     id: number
