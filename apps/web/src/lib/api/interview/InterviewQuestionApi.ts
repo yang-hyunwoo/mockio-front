@@ -1,7 +1,7 @@
 import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
 import { AxiosRequestConfig } from "axios"
-import {InterviewQuestionViewModel } from "@mockio/shared/src/api/view/Interview/InterviewQuestionViewModel";
+import { InterviewQuestionViewModel } from "@mockio/shared/src/api/view/Interview/InterviewQuestionViewModel"
 
 type LoadingType = "top" | "center" | "none"
 
@@ -13,13 +13,22 @@ type LoadingAxiosRequestConfig = AxiosRequestConfig & {
 
 export type InterviewQuestionReadResponse = {
     questions: InterviewQuestionViewModel[]
+    interviewId: number
+    completed: boolean,
+    answerTimeSeconds: number
 }
 
-export const InterviewQuestionApi = async (): Promise<InterviewQuestionReadResponse | null> => {
+type StartInterviewRequest = {
+    idempotencyKey: string
+}
+
+export const InterviewQuestionApi = async (
+    payload: StartInterviewRequest
+): Promise<InterviewQuestionReadResponse | null> => {
     try {
         const response = await api.post(
             `${apiEndpoints.interview}/interviews/start-interview`,
-            null,
+            payload,
             {
                 meta: {
                     loading: "center",

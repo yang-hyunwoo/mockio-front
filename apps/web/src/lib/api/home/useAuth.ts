@@ -6,25 +6,47 @@ import { SessionValidateResponse } from "@mockio/shared/src/api/home/SessionVali
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
 
-export function useAuth() {
-    const [authState, setAuthState] = useState<AuthState>("loading");
+interface UseAuthOptions {
+    enabled?: boolean;
+}
+
+export function useAuth({ enabled = true }: UseAuthOptions = {}) {
+
+    const [authState, setAuthState] = useState<AuthState>(
+        enabled ? "loading" : "unauthenticated"
+    );
     const [session, setSession] = useState<SessionValidateResponse | null>(null);
 
     useEffect(() => {
-        const controller = new AbortController();
+        if (!enabled) {
+            setAuthState("unauthenticated");
+            setSession(null);
+            return;
+        }
 
+        let cancelled = false;
         validateSession()
             .then((data) => {
-                setAuthState("authenticated");
-                setSession(data);
+                if (cancelled) return;
+
+                if (data) {
+                    setAuthState("authenticated");
+                    setSession(data);
+                } else {
+                    setAuthState("unauthenticated");
+                    setSession(null);
+                }
             })
             .catch(() => {
+                if (cancelled) return;
                 setAuthState("unauthenticated");
                 setSession(null);
             });
 
-        return () => controller.abort();
-    }, []);
+        return () => {
+            cancelled = true;
+        };
+    }, [enabled]);
 
     const username =
         session?.username ?? session?.preferredUsername ?? session?.name ?? null;

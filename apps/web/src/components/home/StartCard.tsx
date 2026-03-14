@@ -8,8 +8,12 @@ import { Preference } from "@mockio/shared/src/api/home/Preference";
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
 
-export default function StartCard() {
-    const { authState, username } = useAuth();
+interface StartCardProps {
+    isLogin: boolean;
+}
+
+export default function StartCard({ isLogin }: StartCardProps) {
+    const { authState, username } = useAuth({ enabled: isLogin });
     const [pref, setPref] = useState<Preference | null>(null);
     const [prefLoading, setPrefLoading] = useState(false);
     const [prefError, setPrefError] = useState<string | null>(null);

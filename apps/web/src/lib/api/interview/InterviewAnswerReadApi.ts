@@ -13,7 +13,6 @@ export async function InterviewAnswerReadApi(questionId: number): Promise<Interv
         const response = await api.get<ApiResponse<InterviewAnswerDetailResponse>>(
             `${apiEndpoints.interview}/interviews/answer/${questionId}`
         )
-        console.log("InterviewAnswerReadApi response:", response.data)
         return response.data.data
     } catch (error) {
         console.error("InterviewAnswerReadApi error:", error)

@@ -1,26 +1,18 @@
 "use client"
 
 import InterviewCarousel from "@/components/home/InterviewCarousel";
-import { useAuth } from "@/lib/api/home/useAuth";
 import {Interview} from "@mockio/shared/src/api/home/Interview";
 import {interviewListApi} from "@/lib/api/home/InterviewListApi";
 import { useEffect, useState } from "react";
 
-interface ProfileCardProps {
-    isLogin: boolean
-    interviews?: Interview[]
-}
 
-export function ProfileCard() {
-    const { authState, username } = useAuth();
-
-    const isAuthed = authState === "authenticated";
+export function ProfileCard({isLogin}: { isLogin: boolean }) {
 
     const [interviews, setInterviews] = useState<Interview[]>([])
 
     useEffect(() => {
         let cancelled = false
-        if (!isAuthed) return
+        if (!isLogin) return
 
         interviewListApi()
             .then((res) => {
@@ -36,11 +28,11 @@ export function ProfileCard() {
         return () => {
             cancelled = true
         }
-    }, [isAuthed])
+    }, [isLogin])
 
     return (
         <div id="profile"
-            className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass-strong)] p-6 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
+             className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass-strong)] p-6 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
         >
             <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">
                 Profile
@@ -50,7 +42,7 @@ export function ProfileCard() {
                 진행중인 면접
             </h3>
 
-            {!isAuthed ? (
+            {!isLogin ? (
                 <p className="mt-2 text-sm text-[var(--brand-copy)]">
                     로그인 후 연습 기록, 피드백 리포트, 목표 설정을 확인할 수 있습니다.
                 </p>
