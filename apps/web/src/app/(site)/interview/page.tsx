@@ -85,7 +85,7 @@ export default function InterviewPage() {
             }
         }
 
-        fetchInterview()
+        void fetchInterview()
     }, [])
 
     useEffect(() => {
@@ -125,7 +125,7 @@ export default function InterviewPage() {
             }
         }
 
-        fetchAnswerAndFeedback()
+        void fetchAnswerAndFeedback()
     }, [current?.id])
 
     useEffect(() => {
@@ -133,6 +133,7 @@ export default function InterviewPage() {
 
         setStartedAtByQuestionId((prev) => {
             if (prev[current.id]) return prev
+
             return {
                 ...prev,
                 [current.id]: Date.now(),
@@ -155,6 +156,7 @@ export default function InterviewPage() {
 
         const updateDuration = () => {
             const startedAt = startedAtByQuestionId[current.id]
+
             if (!startedAt) {
                 setAnswerDurationSeconds(0)
                 return
@@ -185,17 +187,15 @@ export default function InterviewPage() {
             }
 
             Object.values(feedbackPollingMapRef.current).forEach((timerId) => {
-                if (timerId) window.clearInterval(timerId)
+                if (timerId) {
+                    window.clearInterval(timerId)
+                }
             })
         }
     }, [])
 
-    useEffect(() => {
-        if (!current) return
-        if (submittedQuestionIds[current.id]) return
-
-        setAnswerDurationSeconds(0)
-    }, [current?.id])
+    const isCurrentSubmitted = current ? !!submittedQuestionIds[current.id] : false
+    const isCurrentExpired = current ? !!expiredQuestionIds[current.id] : false
 
     const remainingSec =
         typeof current?.timeLimitSec === "number"
@@ -209,8 +209,6 @@ export default function InterviewPage() {
     const isFeedbackSucceeded = currentFeedback?.status.code === "SUCCEEDED"
     const isFeedbackFailed = currentFeedback?.status.code === "FAILED"
     const isFeedbackSkipped = currentFeedback?.status.code === "SKIPPED"
-    const isCurrentSubmitted = current ? !!submittedQuestionIds[current.id] : false
-    const isCurrentExpired = current ? !!expiredQuestionIds[current.id] : false
 
     const displaySec = isCurrentSubmitted ? answerDurationSeconds : remainingSec
     const timerLabel = isCurrentSubmitted ? "답변 시간" : "남은 시간"
@@ -232,6 +230,7 @@ export default function InterviewPage() {
     const goNext = () => {
         if (!current) return
         if (!submittedQuestionIds[current.id]) return
+
         setIndex((v) => Math.min(v + 1, questions.length - 1))
     }
 
@@ -295,7 +294,7 @@ export default function InterviewPage() {
             const questionStartedAt = startedAtByQuestionId[question.id]
             const durationSeconds = questionStartedAt
                 ? Math.floor((Date.now() - questionStartedAt) / 1000)
-                : answerDurationSeconds
+                : 0
 
             setSubmittedDurationByQuestionId((prev) => ({
                 ...prev,
@@ -340,7 +339,7 @@ export default function InterviewPage() {
                     questionText: nextQuestion.questionText,
                     tags: nextQuestion.tags ?? [],
                     type: nextQuestion.type,
-                    timeLimitSec: result?.answerTimeSeconds,
+                    timeLimitSec: result.answerTimeSeconds,
                 } as InterviewQuestion)
             }
 
@@ -366,17 +365,24 @@ export default function InterviewPage() {
 
     const submitCurrent = async () => {
         if (!current) return
+        if (isCurrentSubmitted) return
+
         await submitQuestion(current)
     }
 
     useEffect(() => {
         if (!current) return
-        if (remainingSec === null) return
-        if (remainingSec > 0) return
         if (isSubmitting) return
         if (submittedQuestionIds[current.id]) return
         if (expiredQuestionIds[current.id]) return
-        if (!startedAtByQuestionId[current.id]) return
+
+        const startedAt = startedAtByQuestionId[current.id]
+        if (!startedAt) return
+
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+        const timeLimit = current.timeLimitSec ?? 0
+
+        if (elapsed < timeLimit) return
 
         setExpiredQuestionIds((prev) => ({
             ...prev,
@@ -385,12 +391,13 @@ export default function InterviewPage() {
 
         void submitQuestion(current, { autoSubmit: true })
     }, [
-        current,
-        remainingSec,
+        current?.id,
+        current?.timeLimitSec,
         isSubmitting,
         submittedQuestionIds,
         expiredQuestionIds,
         startedAtByQuestionId,
+        answerDurationSeconds,
     ])
 
     const getQuestionGuideText = (typeCode?: string) => {
@@ -649,12 +656,7 @@ export default function InterviewPage() {
                         <Button
                             className="rounded-xl"
                             onClick={submitCurrent}
-                            disabled={
-                                isSubmitting ||
-                                currentAnswer.trim().length === 0 ||
-                                isCurrentSubmitted ||
-                                isCurrentExpired
-                            }
+                            disabled={isSubmitting || isCurrentSubmitted || isCurrentExpired}
                         >
                             <Send className="mr-2 h-4 w-4" />
                             {isCurrentSubmitted

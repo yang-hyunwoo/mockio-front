@@ -91,14 +91,14 @@ api.interceptors.response.use(
         const status = error.response.status;
         const currentPath =
             typeof window !== "undefined" ? window.location.pathname : "";
-
-        if (status === 401) {
-            const reqUrl = error.config?.url;
-
-            if (!isAuthPath(reqUrl) && currentPath !== "/login") {
-                window.location.href = `http://localhost:9000/api/auth/v1/public/login`;
-            }
-        }
+        //cohouseol
+        // if (status === 401) {
+        //     const reqUrl = error.config?.url;
+        //
+        //     if (!isAuthPath(reqUrl) && currentPath !== "/login") {
+        //         window.location.href = `http://localhost:9000/api/auth/v1/public/login`;
+        //     }
+        // }
 
         return Promise.reject(error);
     }

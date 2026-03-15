@@ -1,10 +1,14 @@
 import HomeShell from "@/components/home/HomeShell";
 import HomeHeader from "@/components/home/HomeHeader";
+import {cookies} from "next/headers";
 
-export default function SiteLayout({children,}: { children: React.ReactNode; }) {
+export default async function SiteLayout({children,}: { children: React.ReactNode; }) {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("MOCKIO_SESSION");
+    const isLogin = !!session?.value;
     return (
         <HomeShell>
-            <HomeHeader/>
+            <HomeHeader isLogin={isLogin}/>
             {children}
         </HomeShell>
     );

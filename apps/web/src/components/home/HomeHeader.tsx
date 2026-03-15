@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/Common/Button";
+import NotificationDropdown from "@/components/home/NotificationDropdown";
 
-export default function HomeHeader() {
+export default function HomeHeader({isLogin}: { isLogin: boolean }) {
+
     return (
         <header className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-6">
@@ -78,38 +80,26 @@ export default function HomeHeader() {
                 </nav>
             </div>
 
-            <div className="flex items-center gap-3">
-                <a href="#preview"
-                   className="inline-flex
-                               h-10
-                               items-center
-                               rounded-full
-                               border border-(--border-soft)
-                               px-4
-                               text-sm
-                               font-medium text-(--brand-secondary)
-                               transition-colors hover:border-(--brand-secondary)
-                               hover:bg-(--surface-glass)"
-                >
-                    게스트 미리보기
-                </a>
-                <Link
-                    href="/interview"
-                    className="inline-flex
-                               h-10
-                               items-center
-                               rounded-full
-                               bg-(--brand-primary)
-                               px-4
-                               text-sm
-                               font-semibold
-                               text-white
-                               transition-colors
-                               hover:bg-(--brand-primary-hover)"
-                >
-                    면접 시작
-                </Link>
+            <div className="flex items-center gap-6">
+                {isLogin ? (
+                    <>
+                        <NotificationDropdown/>
 
+                        <Link
+                            href="/interview"
+                            className="inline-flex h-10 items-center rounded-full bg-[var(--brand-primary)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
+                        >
+                            면접 시작
+                        </Link>
+                    </>
+                ) : (
+                    <Link
+                        href="#preview"
+                        className="inline-flex h-10 items-center rounded-full border border-[var(--border-soft)] px-4 text-sm font-medium text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
+                    >
+                        게스트 미리보기
+                    </Link>
+                )}
             </div>
         </header>
     );
