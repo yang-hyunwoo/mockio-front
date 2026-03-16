@@ -241,17 +241,17 @@ export default function NotificationDropdown() {
                             })
                         )}
                     </div>
-
-                    <div className="border-t border-black/5 px-4 py-3 dark:border-white/10">
-                        <Link
-                            href="/notifications"
-                            className="block text-center text-sm font-medium text-(--brand-primary) hover:underline"
-                            onClick={() => setOpen(false)}
-                        >
-                            전체 알림 보기
-                            {hasNext ? " +" : ""}
-                        </Link>
-                    </div>
+                    {/*TODO : 추후 전체 알림 페이지 추가 하기*/}
+                    {/*<div className="border-t border-black/5 px-4 py-3 dark:border-white/10">*/}
+                    {/*    <Link*/}
+                    {/*        href="/notifications"*/}
+                    {/*        className="block text-center text-sm font-medium text-(--brand-primary) hover:underline"*/}
+                    {/*        onClick={() => setOpen(false)}*/}
+                    {/*    >*/}
+                    {/*        전체 알림 보기*/}
+                    {/*        {hasNext ? " +" : ""}*/}
+                    {/*    </Link>*/}
+                    {/*</div>*/}
                 </div>
             )}
         </div>

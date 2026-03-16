@@ -27,6 +27,12 @@ export default function HomeHeader({isLogin}: { isLogin: boolean }) {
                     >
                         공지사항
                     </Link>
+                    <Link
+                        href="/faq"
+                        className="text-(--brand-muted) transition-colors hover:text-foreground"
+                    >
+                        FAQ
+                    </Link>
 
                     <div className="relative group">
                         <Button
