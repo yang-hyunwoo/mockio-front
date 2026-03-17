@@ -11,11 +11,11 @@ import {
 } from "lucide-react"
 import Button from "@/components/Common/Button"
 import { InterviewQuestionApi } from "@/lib/api/interview/InterviewQuestionApi"
-import { InterviewQuestion } from "@mockio/shared/src/api/Interview/InterviewQuestion"
+import { InterviewQuestion } from "@mockio/shared/src/api/interview/InterviewQuestion"
 import { InterviewAnswerApi } from "@/lib/api/interview/InterviewAnswerApi"
 import { InterviewAnswerReadApi } from "@/lib/api/interview/InterviewAnswerReadApi"
 import { FeedbackDetailApi } from "@/lib/api/interview/FeedbackDetailApi"
-import { FeedbackResponse } from "@mockio/shared/src/api/Interview/FeedbackDetail"
+import { FeedbackResponse } from "@mockio/shared/src/api/interview/FeedbackDetail"
 
 export default function InterviewPage() {
     const [questions, setQuestions] = useState<InterviewQuestion[]>([])

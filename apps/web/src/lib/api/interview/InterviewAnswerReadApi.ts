@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
-import {InterviewAnswerDetailResponse} from "@mockio/shared/src/api/Interview/InterviewAnswerDetailResponse";
+import {InterviewAnswerDetailResponse} from "@mockio/shared/src/api/interview/InterviewAnswerDetailResponse";
 
 
 type ApiResponse<T> = {

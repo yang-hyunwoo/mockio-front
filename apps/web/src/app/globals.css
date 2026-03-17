@@ -16,13 +16,21 @@
   --font-mono: var(--font-geist-mono);
 }
 :root {
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: #e2e8f0;
 }
 
 .dark {
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
+  --bg-page: #0b1220;
+  --bg-card: #111827;
+  --bg-input: #1f2937;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --border-color: #334155;
 }
 body {
   background: var(--bg-primary);

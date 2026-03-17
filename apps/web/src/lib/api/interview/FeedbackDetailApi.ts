@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
-import {FeedbackResponse} from "@mockio/shared/src/api/Interview/FeedbackDetail";
+import {FeedbackResponse} from "@mockio/shared/src/api/interview/FeedbackDetail";
 import {AxiosRequestConfig} from "axios";
 
 type LoadingType = "top" | "center" | "none"
