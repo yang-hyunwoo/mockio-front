@@ -12,11 +12,10 @@ type InterviewStatusCode = "ACTIVE" | "ENDED"
 const PAGE_SIZE = 10
 
 const getStatusMeta = (status: InterviewStatusCode, item: InterviewItem) => {
-  console.log(status)
     switch (status) {
         case "ENDED":
             return {
-                label: "완료44",
+                label: "완료",
                 badgeClass:
                     "bg-emerald-500/12 text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400 dark:ring-emerald-400/20",
                 buttonLabel: "결과 보기",
@@ -31,15 +30,6 @@ const getStatusMeta = (status: InterviewStatusCode, item: InterviewItem) => {
                 buttonLabel: "이어하기",
                 buttonHref: `/interview`,
                 icon: <Clock3 className="h-4 w-4" />,
-            }
-        default:
-            return {
-                label: "실패",
-                badgeClass:
-                    "bg-slate-500/12 text-slate-600 ring-1 ring-slate-500/20 dark:text-slate-300 dark:ring-slate-300/20",
-                buttonLabel: "에러",
-                buttonHref: "",
-                icon: <PlayCircle className="h-4 w-4" />,
             }
     }
 }

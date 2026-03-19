@@ -73,10 +73,10 @@ export default function FaqPage() {
         <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
             <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/70">
                 <div className="border-b border-black/5 px-6 py-8 dark:border-white/10 sm:px-8">
-                    <p className="text-sm font-semibold tracking-[0.18em] text-[var(--brand-primary)]">
+                    <p className="text-sm font-semibold tracking-[0.18em] text-(--brand-primary)">
                         SUPPORT
                     </p>
-                    <h1 className="mt-3 text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
+                    <h1 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl">
                         자주 묻는 질문
                     </h1>
                     <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
@@ -96,9 +96,9 @@ export default function FaqPage() {
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                         <p>
                             총{" "}
-                            <span className="font-semibold text-[var(--text-primary)]">
-                {filteredFaqs.length}
-              </span>
+                            <span className="font-semibold text-foreground">
+                                {filteredFaqs.length}
+                            </span>
                             개의 FAQ
                         </p>
                         <p>{totalPages > 0 ? `${page} / ${totalPages} 페이지` : "0 / 0 페이지"}</p>
@@ -107,7 +107,7 @@ export default function FaqPage() {
                     <div className="mt-6 space-y-3">
                         {loading ? (
                             <div className="rounded-2xl border border-dashed border-black/10 px-6 py-12 text-center dark:border-white/10">
-                                <p className="text-base font-semibold text-[var(--text-primary)]">
+                                <p className="text-base font-semibold text-foreground">
                                     FAQ를 불러오는 중입니다.
                                 </p>
                             </div>

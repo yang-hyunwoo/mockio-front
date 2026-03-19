@@ -1,8 +1,5 @@
+import {EnumResponse} from "../EnumResponse";
 
-interface EnumResponse {
-    code: string
-    label: string
-}
 
 interface InterviewQuestionFeedbackItem {
     id: number
@@ -11,6 +8,9 @@ interface InterviewQuestionFeedbackItem {
     answer: string
     feedback: string
     score: number
+    type : EnumResponse,
+    strengths: string[],
+    improvements: string[]
 }
 
 export interface InterviewResultResponse {

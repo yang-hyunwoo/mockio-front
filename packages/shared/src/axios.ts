@@ -40,10 +40,7 @@ function getLoadingType(
 
 export const api = axios.create({
     baseURL: apiBaseUrl,
-    withCredentials: true,
-    headers: {
-        "Content-Type": "application/json",
-    },
+    withCredentials: true
 });
 
 api.interceptors.request.use(

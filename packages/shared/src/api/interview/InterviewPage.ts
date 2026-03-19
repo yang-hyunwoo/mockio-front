@@ -1,7 +1,5 @@
-export interface EnumResponse {
-    code: string
-    label: string
-}
+import {EnumResponse} from "../EnumResponse";
+
 
 export interface InterviewItem {
     id: number

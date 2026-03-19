@@ -7,6 +7,8 @@ import {
     BadgeCheck,
     Brain,
     CheckCircle2,
+    ChevronDown,
+    ChevronUp,
     Clock3,
     MessageSquareText,
     Sparkles,
@@ -46,6 +48,43 @@ const formatDuration = (seconds: number) => {
     return `${min}분 ${sec}초`
 }
 
+const getQuestionTypeStyle = (typeCode?: string) => {
+    if (typeCode === "FOLLOW_UP") {
+        return "border-amber-500/30 bg-amber-500/10 text-amber-300"
+    }
+
+    if (typeCode === "DEEP_DIVE") {
+        return "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
+    }
+
+    return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+}
+
+const getQuestionTypeLabel = (typeCode?: string) => {
+    if (typeCode === "FOLLOW_UP") return "추가 질문"
+    if (typeCode === "DEEP_DIVE") return "심화 질문"
+    return "기본 질문"
+}
+
+const getImprovementText = (item: any) => {
+    return (
+        item.improvement ??
+        item.improvements ??
+        item.feedbackImprovement ??
+        "아직 보완 포인트가 생성되지 않았습니다."
+    )
+}
+
+const getExampleAnswerText = (item: any) => {
+    return (
+        item.exampleAnswer ??
+        item.sampleAnswer ??
+        item.modelAnswer ??
+        item.answerExample ??
+        "아직 답변 예시가 생성되지 않았습니다."
+    )
+}
+
 export default function InterviewResultPage({
                                                 params,
                                             }: {
@@ -56,6 +95,7 @@ export default function InterviewResultPage({
 
     const [result, setResult] = useState<InterviewResultResponse | null>(null)
     const [loading, setLoading] = useState(true)
+    const [openQuestionIds, setOpenQuestionIds] = useState<number[]>([])
 
     useEffect(() => {
         const fetchResult = async () => {
@@ -65,7 +105,6 @@ export default function InterviewResultPage({
                 }
 
                 const data = await InterviewResultApi(interviewId)
-                console.log("data", data)
                 setResult(data)
             } catch (error) {
                 console.error("면접 결과 조회 실패", error)
@@ -83,6 +122,14 @@ export default function InterviewResultPage({
         return Math.round((result.answeredCount / result.totalCount) * 100)
     }, [result])
 
+    const toggleQuestionDetail = (questionId: number) => {
+        setOpenQuestionIds((prev) =>
+            prev.includes(questionId)
+                ? prev.filter((id) => id !== questionId)
+                : [...prev, questionId]
+        )
+    }
+
     if (loading) {
         return (
             <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -96,7 +143,7 @@ export default function InterviewResultPage({
                             {[1, 2, 3, 4].map((idx) => (
                                 <div
                                     key={idx}
-                                    className="rounded-[24px] border border-black/5 bg-white/80 p-5 dark:border-white/10 dark:bg-white/[0.03]"
+                                    className="rounded-3xl border border-black/5 bg-white/80 p-5 dark:border-white/10 dark:bg-white/3"
                                 >
                                     <div className="h-4 w-20 animate-pulse rounded-full bg-black/10 dark:bg-white/10" />
                                     <div className="mt-4 h-8 w-24 animate-pulse rounded-full bg-black/10 dark:bg-white/10" />
@@ -113,10 +160,10 @@ export default function InterviewResultPage({
         return (
             <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="rounded-[28px] border border-black/5 bg-white/70 px-6 py-12 text-center shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-zinc-950/70">
-                    <p className="text-lg font-semibold text-[var(--text-primary)]">
+                    <p className="text-lg font-semibold text-foreground">
                         면접 결과를 불러오지 못했습니다.
                     </p>
-                    <p className="mt-2 text-sm text-[var(--brand-muted)]">
+                    <p className="mt-2 text-sm text-(--brand-muted)">
                         잠시 후 다시 시도해주세요.
                     </p>
                 </div>
@@ -132,7 +179,7 @@ export default function InterviewResultPage({
                 <div className="border-b border-black/5 px-6 py-8 dark:border-white/10 sm:px-8">
                     <Link
                         href="/interview/history"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-[var(--brand-muted)] transition-colors hover:text-[var(--text-primary)]"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-(--brand-muted) transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="h-4 w-4" />
                         면접 기록으로 돌아가기
@@ -140,20 +187,20 @@ export default function InterviewResultPage({
 
                     <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <p className="text-sm font-semibold tracking-[0.18em] text-[var(--brand-primary)]">
+                            <p className="text-sm font-semibold tracking-[0.18em] text-(--brand-primary)">
                                 INTERVIEW RESULT
                             </p>
-                            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text-primary)]">
+                            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
                                 {result.title}
                             </h1>
-                            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-muted)]">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.03] px-3 py-1 dark:bg-white/[0.04]">
+                            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-(--brand-muted)">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/3 px-3 py-1 dark:bg-white/4">
                                     {result.track.label}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.03] px-3 py-1 dark:bg-white/[0.04]">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/3 px-3 py-1 dark:bg-white/4">
                                     난이도 {result.difficulty.label}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.03] px-3 py-1 dark:bg-white/[0.04]">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/3 px-3 py-1 dark:bg-white/4">
                                     피드백 {result.feedbackStyle.label}
                                 </span>
                             </div>
@@ -172,68 +219,68 @@ export default function InterviewResultPage({
 
                 <div className="px-6 py-6 sm:px-8">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                        <div className="rounded-[24px] border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-muted)]">
+                        <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-(--brand-muted)">
                                 <Target className="h-4 w-4" />
                                 전체 점수
                             </div>
-                            <p className="mt-4 text-3xl font-semibold text-[var(--text-primary)]">
+                            <p className="mt-4 text-3xl font-semibold text-foreground">
                                 {result.overallScore ?? "-"}
-                                <span className="ml-1 text-base font-medium text-[var(--brand-muted)]">/ 100</span>
+                                <span className="ml-1 text-base font-medium text-(--brand-muted)">/ 100</span>
                             </p>
                         </div>
 
-                        <div className="rounded-[24px] border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-muted)]">
+                        <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-(--brand-muted)">
                                 <MessageSquareText className="h-4 w-4" />
                                 답변 수
                             </div>
-                            <p className="mt-4 text-3xl font-semibold text-[var(--text-primary)]">
+                            <p className="mt-4 text-3xl font-semibold text-foreground">
                                 {result.answeredCount}
-                                <span className="ml-1 text-base font-medium text-[var(--brand-muted)]">
+                                <span className="ml-1 text-base font-medium text-(--brand-muted)">
                                     / {result.totalCount}
                                 </span>
                             </p>
                         </div>
 
-                        <div className="rounded-[24px] border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-muted)]">
+                        <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-(--brand-muted)">
                                 <Clock3 className="h-4 w-4" />
                                 소요 시간
                             </div>
-                            <p className="mt-4 text-3xl font-semibold text-[var(--text-primary)]">
+                            <p className="mt-4 text-3xl font-semibold text-foreground">
                                 {formatDuration(result.durationSeconds)}
                             </p>
                         </div>
 
-                        <div className="rounded-[24px] border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-muted)]">
+                        <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-(--brand-muted)">
                                 <Brain className="h-4 w-4" />
                                 완료율
                             </div>
-                            <p className="mt-4 text-3xl font-semibold text-[var(--text-primary)]">
+                            <p className="mt-4 text-3xl font-semibold text-foreground">
                                 {completionRate}
-                                <span className="ml-1 text-base font-medium text-[var(--brand-muted)]">%</span>
+                                <span className="ml-1 text-base font-medium text-(--brand-muted)">%</span>
                             </p>
                         </div>
                     </div>
 
                     <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-                        <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
+                        <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
                             <div className="flex items-center gap-2">
-                                <Sparkles className="h-5 w-5 text-[var(--brand-primary)]" />
-                                <h2 className="text-xl font-semibold text-[var(--text-primary)]">종합 총평</h2>
+                                <Sparkles className="h-5 w-5 text-(--brand-primary)" />
+                                <h2 className="text-xl font-semibold text-foreground">종합 총평</h2>
                             </div>
-                            <p className="mt-4 leading-7 text-[var(--brand-muted)]">
+                            <p className="mt-4 leading-7 text-(--brand-muted)">
                                 {result.summary ?? "아직 종합 총평이 생성되지 않았습니다."}
                             </p>
                         </section>
 
                         <div className="grid gap-6">
-                            <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
+                            <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                    <h2 className="text-xl font-semibold text-[var(--text-primary)]">강점</h2>
+                                    <h2 className="text-xl font-semibold text-foreground">강점</h2>
                                 </div>
                                 <ul className="mt-4 space-y-3">
                                     {(result.strengths.length > 0
@@ -241,7 +288,7 @@ export default function InterviewResultPage({
                                         : ["아직 강점 분석이 없습니다."]).map((item, index) => (
                                         <li
                                             key={`${item}-${index}`}
-                                            className="rounded-2xl bg-emerald-500/5 px-4 py-3 text-sm leading-6 text-[var(--text-primary)] ring-1 ring-emerald-500/10"
+                                            className="rounded-2xl bg-emerald-500/5 px-4 py-3 text-sm leading-6 text-foreground ring-1 ring-emerald-500/10"
                                         >
                                             {item}
                                         </li>
@@ -249,10 +296,10 @@ export default function InterviewResultPage({
                                 </ul>
                             </section>
 
-                            <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
+                            <section className="rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
                                 <div className="flex items-center gap-2">
                                     <TriangleAlert className="h-5 w-5 text-amber-500" />
-                                    <h2 className="text-xl font-semibold text-[var(--text-primary)]">보완 포인트</h2>
+                                    <h2 className="text-xl font-semibold text-foreground">보완 포인트</h2>
                                 </div>
                                 <ul className="mt-4 space-y-3">
                                     {(result.improvements.length > 0
@@ -260,7 +307,7 @@ export default function InterviewResultPage({
                                         : ["아직 보완 포인트 분석이 없습니다."]).map((item, index) => (
                                         <li
                                             key={`${item}-${index}`}
-                                            className="rounded-2xl bg-amber-500/5 px-4 py-3 text-sm leading-6 text-[var(--text-primary)] ring-1 ring-amber-500/10"
+                                            className="rounded-2xl bg-amber-500/5 px-4 py-3 text-sm leading-6 text-foreground ring-1 ring-amber-500/10"
                                         >
                                             {item}
                                         </li>
@@ -270,27 +317,37 @@ export default function InterviewResultPage({
                         </div>
                     </div>
 
-                    <section className="mt-6 rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/[0.03]">
+                    <section className="mt-6 rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">
                         <div className="flex items-center gap-2">
-                            <MessageSquareText className="h-5 w-5 text-[var(--brand-primary)]" />
-                            <h2 className="text-xl font-semibold text-[var(--text-primary)]">질문별 상세 피드백</h2>
+                            <MessageSquareText className="h-5 w-5 text-(--brand-primary)" />
+                            <h2 className="text-xl font-semibold text-foreground">질문별 상세 피드백</h2>
                         </div>
 
                         <div className="mt-6 space-y-5">
-                            {result.questions.map((item) => {
+                            {result.questions.map((item, index) => {
                                 const scoreMeta = getScoreMeta(item.score ?? 0)
+                                const isOpen = openQuestionIds.includes(item.id)
 
                                 return (
                                     <article
                                         key={item.id}
-                                        className="rounded-[24px] border border-black/5 bg-white/90 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)] dark:border-white/10 dark:bg-white/[0.02]"
+                                        className="rounded-3xl border border-black/5 bg-white/90 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)] dark:border-white/10 dark:bg-white/2"
                                     >
-                                        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                        <div className="flex flex-col gap-4">
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     <span className="inline-flex items-center rounded-full bg-[var(--brand-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--brand-primary)]">
-                                                        Q{item.questionOrder}
+                                                        Q{index + 1}
                                                     </span>
+
+                                                    <span
+                                                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${getQuestionTypeStyle(
+                                                            item.type.code
+                                                        )}`}
+                                                    >
+                                                        {getQuestionTypeLabel(item.type.code)}
+                                                    </span>
+
                                                     {item.score !== null && (
                                                         <span
                                                             className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${scoreMeta.className}`}
@@ -300,29 +357,86 @@ export default function InterviewResultPage({
                                                     )}
                                                 </div>
 
-                                                <h3 className="mt-3 text-lg font-semibold leading-7 text-[var(--text-primary)]">
+                                                <h3 className="mt-3 text-lg font-semibold leading-7 text-foreground">
                                                     {item.question}
                                                 </h3>
 
                                                 <div className="mt-5 grid gap-4 xl:grid-cols-2">
-                                                    <div className="rounded-2xl bg-black/[0.03] p-4 dark:bg-white/[0.04]">
-                                                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                                                    <div className="rounded-2xl bg-black/3 p-4 dark:bg-white/4">
+                                                        <p className="text-sm font-semibold text-foreground">
                                                             내 답변
                                                         </p>
-                                                        <p className="mt-2 text-sm leading-7 text-[var(--brand-muted)]">
+                                                        <p className="mt-2 whitespace-pre-line text-sm leading-7 text-(--brand-muted)">
                                                             {item.answer ?? "답변 내용이 없습니다."}
                                                         </p>
                                                     </div>
 
                                                     <div className="rounded-2xl bg-[var(--brand-primary)]/5 p-4 ring-1 ring-[var(--brand-primary)]/10">
-                                                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                                                        <p className="text-sm font-semibold text-foreground">
                                                             AI 피드백
                                                         </p>
-                                                        <p className="mt-2 text-sm leading-7 text-[var(--brand-muted)]">
+                                                        <p className="mt-2 whitespace-pre-line text-sm leading-7 text-(--brand-muted)">
                                                             {item.feedback ?? "아직 피드백이 생성되지 않았습니다."}
                                                         </p>
                                                     </div>
                                                 </div>
+
+                                                <div className="mt-4 flex justify-end">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleQuestionDetail(item.id)}
+                                                        className="inline-flex items-center gap-1.5 rounded-full border border-black/10 px-3 py-1.5 text-xs font-medium text-(--brand-muted) transition hover:bg-black/5 hover:text-foreground dark:border-white/10 dark:hover:bg-white/5"
+                                                    >
+                                                        {isOpen ? (
+                                                            <>
+                                                                접기
+                                                                <ChevronUp className="h-4 w-4" />
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                더보기
+                                                                <ChevronDown className="h-4 w-4" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {isOpen && (
+                                                    <div className="mt-4 grid gap-4 xl:grid-cols-2">
+                                                        <div className="rounded-2xl bg-amber-500/5 p-4 ring-1 ring-amber-500/10">
+                                                            <p className="text-sm font-semibold text-foreground">
+                                                                보완하면 좋은 점
+                                                            </p>
+
+                                                            {item.improvements?.length ? (
+                                                                <ul className="mt-3 space-y-2">
+                                                                    {item.improvements.map((point, index) => (
+                                                                        <li
+                                                                            key={index}
+                                                                            className="flex items-start gap-2 text-sm leading-6 text-(--brand-muted)"
+                                                                        >
+                                                                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-400" />
+                                                                            {point}
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            ) : (
+                                                                <p className="mt-2 text-sm text-(--brand-muted)">
+                                                                    아직 보완 포인트가 생성되지 않았습니다.
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="rounded-2xl bg-emerald-500/5 p-4 ring-1 ring-emerald-500/10">
+                                                            <p className="text-sm font-semibold text-foreground">
+                                                                답변 예시
+                                                            </p>
+                                                            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-(--brand-muted)">
+                                                                {getExampleAnswerText(item)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </article>

@@ -1,3 +1,6 @@
+import {EnumResponse} from "../EnumResponse";
+
+
 export interface  InterviewQuestion  {
     id: number
     interviewId : number
@@ -5,9 +8,6 @@ export interface  InterviewQuestion  {
     questionText: string
     tags?: string[]
     timeLimitSec?: number
-    type : {
-        code : string,
-        label : string
-    }
+    type : EnumResponse
     seq : number
 }
