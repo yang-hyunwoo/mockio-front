@@ -11,6 +11,20 @@ export type Track = "BACKEND_ENGINEER" |
     "GENERAL"
     ;
 
+export type TrackAll = "ALL" |
+    "BACKEND_ENGINEER" |
+    "FRONTEND_ENGINEER" |
+    "SERVER_ENGINEER" |
+    "DATA_ENGINEER" |
+    "DESIGN" |
+    "PRODUCT" |
+    "BUSINESS" |
+    "MARKETING" |
+    "SALES" |
+    "HR" |
+    "GENERAL"
+    ;
+
 export type FeedbackStyle = "STRICT" |
     "COACHING" |
     "FRIENDLY"
@@ -58,6 +72,21 @@ export const ANSWER_TIME_OPTIONS: { value: AnswerTimeSeconds; label: string }[] 
 ];
 
 export const TRACK: { value: Track; label: string }[] = [
+    { value: "BACKEND_ENGINEER", label: "백엔드" },
+    { value: "FRONTEND_ENGINEER", label: "프론트엔드" },
+    { value: "SERVER_ENGINEER", label: "서버" },
+    { value: "DATA_ENGINEER", label: "데이터 분석가" },
+    { value: "DESIGN", label: "그래픽" },
+    { value: "PRODUCT", label: "PM" },
+    { value: "BUSINESS", label: "전략" },
+    { value: "MARKETING", label: "마케팅" },
+    { value: "SALES", label: "영업" },
+    { value: "HR", label: "HR" },
+    { value: "GENERAL", label: "범용" },
+];
+
+export const TRACKALL: { value: TrackAll; label: string }[] = [
+    { value: "ALL", label: "전체" },
     { value: "BACKEND_ENGINEER", label: "백엔드" },
     { value: "FRONTEND_ENGINEER", label: "프론트엔드" },
     { value: "SERVER_ENGINEER", label: "서버" },

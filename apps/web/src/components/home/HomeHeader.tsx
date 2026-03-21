@@ -81,14 +81,49 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
                             </div>
 
                             <div className="relative group">
-                                <Link
-                                    // href="/mypage"
-                                    href="/mypage/interview/history"
-                                    className="text-(--brand-muted) transition-colors hover:text-foreground"
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-auto px-0 font-medium text-(--brand-muted) hover:text-foreground"
+                                    rightIcon={
+                                        <span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">
+                                            ▾
+                                        </span>
+                                    }
                                 >
-                                    내 정보
-                                </Link>
+                                   내 정보
+                                </Button>
+
+                                <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
+                                    <div
+                                        className="min-w-55 overflow-hidden rounded-2xl border border-white/30
+                                                   bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl"
+                                    >
+                                        <Link
+                                            href="/mypage"
+                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
+                                        >
+                                            내 정보
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                면접 정보 및 내 정보를 수정 합니다.
+                                            </p>
+                                        </Link>
+
+                                        <div className="h-px bg-black/5" />
+
+                                        <Link
+                                            href="/mypage/interview/history"
+                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
+                                        >
+                                            면접 기록
+                                            <p className="mt-1 block text-xs text-gray-500">
+                                               면접 평가 내역을 확인 합니다.
+                                            </p>
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
+
                         </>
                     )}
                 </nav>

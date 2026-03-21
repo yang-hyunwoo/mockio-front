@@ -12,6 +12,7 @@ import {
     TriangleAlert,
     ChevronLeft,
     ChevronRight,
+    BadgeCheck,
 } from "lucide-react";
 import {
     LineChart,
@@ -22,187 +23,71 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
+import { InterviewHistoryApi } from "@/lib/api/mypage/InterviewHistoryApi";
+import {
+    GrowthSectionProps,
+    HistoryItem,
+} from "@mockio/shared/src/api/mypage/InterviewHistoryResponse";
+import {TRACKALL, TrackAll} from "@mockio/shared/src/api/mypage/MyPageEnum";
 
-type TrackFilter = "ALL" | "BACKEND" | "CS" | "SPRING";
-type InterviewStatus = "READY" | "IN_PROGRESS" | "COMPLETED";
-
-interface ScoreHistoryItem {
+type ChartItem = {
     interviewId: number;
     title: string;
-    track: Exclude<TrackFilter, "ALL">;
+    trackCode: string;
+    trackLabel: string;
     score: number;
     date: string;
-}
+    endedAt: string;
+};
 
-interface HistoryItem {
-    interviewId: number;
-    title: string;
-    track: Exclude<TrackFilter, "ALL">;
-    status: InterviewStatus;
-    score?: number;
-    feedbackCount: number;
-    createdAt: string;
-}
-
-interface WeakPointItem {
-    category: string;
+type WeakPointItem = {
+    label: string;
+    message: string;
     averageScore: number;
-}
-
-interface GrowthSectionProps {
-    scoreHistory: ScoreHistoryItem[];
-    historyItems: HistoryItem[];
-}
-
-const mockData: GrowthSectionProps = {
-    scoreHistory: [
-        { interviewId: 1, title: "백엔드 기술 면접", track: "BACKEND", score: 64, date: "03.01" },
-        { interviewId: 2, title: "Spring 심화 면접", track: "SPRING", score: 71, date: "03.05" },
-        { interviewId: 3, title: "CS 기본 면접", track: "SPRING", score: 69, date: "03.09" },
-        { interviewId: 4, title: "JPA 면접", track: "BACKEND", score: 76, date: "03.12" },
-        { interviewId: 5, title: "실전 모의 면접", track: "BACKEND", score: 82, date: "03.18" },
-        { interviewId: 6, title: "운영체제 면접", track: "CS", score: 74, date: "03.19" },
-        { interviewId: 7, title: "Spring Boot 심화", track: "SPRING", score: 79, date: "03.20" },
-    ],
-    historyItems: [
-        {
-            interviewId: 12,
-            title: "실전 모의 면접 12",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 88,
-            feedbackCount: 5,
-            createdAt: "2026-03-19",
-        },
-        {
-            interviewId: 11,
-            title: "실전 모의 면접 11",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 84,
-            feedbackCount: 5,
-            createdAt: "2026-03-18",
-        },
-        {
-            interviewId: 10,
-            title: "JPA 면접 10",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 76,
-            feedbackCount: 5,
-            createdAt: "2026-03-17",
-        },
-        {
-            interviewId: 9,
-            title: "CS 기본 면접 9",
-            track: "CS",
-            status: "COMPLETED",
-            score: 69,
-            feedbackCount: 5,
-            createdAt: "2026-03-16",
-        },
-        {
-            interviewId: 8,
-            title: "Spring 심화 면접 8",
-            track: "SPRING",
-            status: "IN_PROGRESS",
-            feedbackCount: 3,
-            createdAt: "2026-03-15",
-        },
-        {
-            interviewId: 7,
-            title: "백엔드 기술 면접 7",
-            track: "BACKEND",
-            status: "READY",
-            feedbackCount: 0,
-            createdAt: "2026-03-14",
-        },
-        {
-            interviewId: 6,
-            title: "백엔드 기술 면접 6",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 73,
-            feedbackCount: 5,
-            createdAt: "2026-03-13",
-        },
-        {
-            interviewId: 5,
-            title: "실전 모의 면접 5",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 82,
-            feedbackCount: 5,
-            createdAt: "2026-03-12",
-        },
-        {
-            interviewId: 4,
-            title: "JPA 면접 4",
-            track: "BACKEND",
-            status: "COMPLETED",
-            score: 76,
-            feedbackCount: 5,
-            createdAt: "2026-03-11",
-        },
-        {
-            interviewId: 3,
-            title: "CS 기본 면접 3",
-            track: "CS",
-            status: "COMPLETED",
-            score: 69,
-            feedbackCount: 5,
-            createdAt: "2026-03-10",
-        },
-        {
-            interviewId: 2,
-            title: "Spring 심화 면접 2",
-            track: "SPRING",
-            status: "IN_PROGRESS",
-            feedbackCount: 3,
-            createdAt: "2026-03-09",
-        },
-        {
-            interviewId: 1,
-            title: "백엔드 기술 면접 1",
-            track: "BACKEND",
-            status: "READY",
-            feedbackCount: 0,
-            createdAt: "2026-03-08",
-        },
-    ],
 };
 
-const weakPointsByTrack: Record<TrackFilter, WeakPointItem[]> = {
-    ALL: [
-        { category: "운영체제", averageScore: 62 },
-        { category: "네트워크", averageScore: 68 },
-        { category: "데이터베이스", averageScore: 71 },
-    ],
-    BACKEND: [
-        { category: "트랜잭션", averageScore: 66 },
-        { category: "JPA", averageScore: 72 },
-        { category: "API 설계", averageScore: 74 },
-    ],
-    CS: [
-        { category: "운영체제", averageScore: 62 },
-        { category: "네트워크", averageScore: 67 },
-        { category: "자료구조", averageScore: 73 },
-    ],
-    SPRING: [
-        { category: "AOP", averageScore: 65 },
-        { category: "시큐리티", averageScore: 69 },
-        { category: "빈 생명주기", averageScore: 75 },
-    ],
+const emptyData: GrowthSectionProps = {
+    scoreSection: {
+        scoreHistory: [],
+    },
+    historySection: {
+        historyItems: [],
+    },
+    weakPoints: {
+        weakPointList: [],
+    },
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
 };
 
-const ITEMS_PER_PAGE = 5;
 
-const TRACK_OPTIONS: { label: string; value: TrackFilter }[] = [
-    { label: "전체", value: "ALL" },
-    { label: "백엔드", value: "BACKEND" },
-    { label: "CS", value: "CS" },
-    { label: "스프링", value: "SPRING" },
-];
+
+function formatChartDate(value: string) {
+    if (!value) return "-";
+    if (value.includes(".")) return value;
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${month}.${day}`;
+}
+
+function formatDisplayDate(value: string) {
+    if (!value) return "-";
+    if (value.includes(".") || value.includes("-")) return value;
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleDateString("ko-KR");
+}
 
 function CustomScoreTooltip({
                                 active,
@@ -210,7 +95,7 @@ function CustomScoreTooltip({
                                 label,
                             }: {
     active?: boolean;
-    payload?: Array<{ value: number; payload: ScoreHistoryItem }>;
+    payload?: Array<{ value: number; payload: ChartItem }>;
     label?: string;
 }) {
     if (!active || !payload || payload.length === 0) {
@@ -225,31 +110,42 @@ function CustomScoreTooltip({
             <div className="font-medium">날짜: {label}</div>
             <div className="mt-1">점수: {score}점</div>
             <div className="mt-1 text-xs text-slate-300">{item.title}</div>
-            <div className="mt-1 text-xs text-slate-400">{item.track}</div>
+            <div className="mt-1 text-xs text-slate-400">{item.trackLabel}</div>
         </div>
     );
 }
 
-const getStatusMeta = (status: HistoryItem["status"]) => {
-    switch (status) {
-        case "COMPLETED":
+const getStatusMeta = (item: HistoryItem) => {
+    const statusCode = item.status?.code;
+    const endReasonCode = item.endReason?.code;
+    const isUserExit = endReasonCode === "USER_EXIT";
+
+    switch (statusCode) {
+        case "ENDED":
+            if (isUserExit) {
+                return {
+                    label: "중도 종료",
+                    badgeClass:
+                        "bg-amber-500/12 text-amber-600 ring-1 ring-amber-500/20 dark:text-amber-400 dark:ring-amber-400/20",
+                    buttonHref: `/interview/history/${item.interviewId}`,
+                    icon: <TriangleAlert className="h-4 w-4" />,
+                };
+            }
+
             return {
                 label: "완료",
-                className:
-                    "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400 dark:ring-emerald-400/20",
+                badgeClass:
+                    "bg-emerald-500/12 text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400 dark:ring-emerald-400/20",
+                buttonHref: `/interview/history/${item.interviewId}`,
+                icon: <BadgeCheck className="h-4 w-4" />,
             };
-        case "IN_PROGRESS":
-            return {
-                label: "진행중",
-                className:
-                    "bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20 dark:text-blue-400 dark:ring-blue-400/20",
-            };
-        case "READY":
+
         default:
             return {
-                label: "준비",
-                className:
-                    "bg-slate-500/10 text-slate-600 ring-1 ring-slate-500/20 dark:text-slate-300 dark:ring-slate-400/20",
+                label: "알 수 없음",
+                badgeClass:
+                    "bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20",
+                icon: null,
             };
     }
 };
@@ -366,33 +262,81 @@ function Pagination({
     );
 }
 
-export default function Page(props: Partial<GrowthSectionProps>) {
-    const { scoreHistory, historyItems } = {
-        ...mockData,
-        ...props,
+export default function Page() {
+    const [data, setData] = useState<GrowthSectionProps>(emptyData);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedTrack, setSelectedTrack] = useState<TrackAll>("ALL");
+    const [page, setPage] = useState(0);
+
+    useEffect(() => {
+        const fetchInterviewHistory = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const track = selectedTrack === "ALL" ? undefined : selectedTrack;
+
+                // 현재 API 시그니처에 맞게 인자만 맞춰 주세요.
+                // 예: InterviewHistoryApi(page, track)
+                const result = await InterviewHistoryApi(page, track);
+
+                setData(result ?? emptyData);
+            } catch (e) {
+                console.error(e);
+                setError("면접 히스토리를 불러오지 못했습니다.");
+                setData(emptyData);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInterviewHistory();
+    }, [page, selectedTrack]);
+
+    const handleTrackChange = (value: TrackAll) => {
+        setPage(0);
+        setSelectedTrack(value);
     };
 
-    const [selectedTrack, setSelectedTrack] = useState<TrackFilter>("ALL");
-    const [currentPage, setCurrentPage] = useState(1);
+    const safeScoreItems = Array.isArray(data.scoreSection?.scoreHistory)
+        ? data.scoreSection.scoreHistory
+        : [];
 
-    const filteredScoreHistory = useMemo(() => {
-        if (selectedTrack === "ALL") return scoreHistory;
-        return scoreHistory.filter((item) => item.track === selectedTrack);
-    }, [scoreHistory, selectedTrack]);
+    const safeHistoryItems = Array.isArray(data.historySection?.historyItems)
+        ? data.historySection.historyItems
+        : [];
 
-    const filteredHistoryItems = useMemo(() => {
-        if (selectedTrack === "ALL") return historyItems;
-        return historyItems.filter((item) => item.track === selectedTrack);
-    }, [historyItems, selectedTrack]);
+    const weakPointList: WeakPointItem[] = Array.isArray(data.weakPoints?.weakPointList)
+        ? data.weakPoints.weakPointList
+        : [];
+
+    const chartData = useMemo<ChartItem[]>(() => {
+        return safeScoreItems.map((item) => ({
+            interviewId: item.interviewId,
+            title: item.title,
+            trackCode: item.track.code,
+            trackLabel: item.track.label,
+            score: item.score,
+            endedAt: item.endedAt,
+            date: formatChartDate(item.endedAt),
+        }));
+    }, [safeScoreItems]);
 
     const completedItems = useMemo(
-        () => filteredHistoryItems.filter((item) => item.status === "COMPLETED"),
-        [filteredHistoryItems]
+        () =>
+            safeHistoryItems.filter(
+                (item) =>
+                    item.endReason?.code === "COMPLETED" &&
+                    item.status?.code === "ENDED"
+            ),
+        [safeHistoryItems]
     );
 
     const averageScore = useMemo(() => {
         const scoredItems = completedItems.filter(
-            (item): item is HistoryItem & { score: number } => typeof item.score === "number"
+            (item): item is (typeof completedItems)[number] & { score: number } =>
+                typeof item.score === "number"
         );
 
         if (scoredItems.length === 0) return 0;
@@ -403,8 +347,14 @@ export default function Page(props: Partial<GrowthSectionProps>) {
 
     const recentChange = useMemo(() => {
         const scoredItems = [...completedItems]
-            .filter((item): item is HistoryItem & { score: number } => typeof item.score === "number")
-            .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            .filter(
+                (item): item is (typeof completedItems)[number] & { score: number } =>
+                    typeof item.score === "number"
+            )
+            .sort(
+                (a, b) =>
+                    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
 
         if (scoredItems.length < 2) return 0;
 
@@ -415,19 +365,28 @@ export default function Page(props: Partial<GrowthSectionProps>) {
     }, [completedItems]);
 
     const completedCount = completedItems.length;
-    const weakPoints = weakPointsByTrack[selectedTrack];
+    const currentPage = data.number + 1;
+    const totalPages = Math.max(1, data.totalPages || 1);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedTrack]);
+    if (loading) {
+        return (
+            <section className="space-y-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                    면접 히스토리를 불러오는 중입니다.
+                </div>
+            </section>
+        );
+    }
 
-    const totalPages = Math.max(1, Math.ceil(filteredHistoryItems.length / ITEMS_PER_PAGE));
-
-    const pagedHistoryItems = useMemo(() => {
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-        return filteredHistoryItems.slice(startIndex, endIndex);
-    }, [currentPage, filteredHistoryItems]);
+    if (error) {
+        return (
+            <section className="space-y-6">
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center text-sm text-rose-600 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
+                    {error}
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="space-y-6">
@@ -446,15 +405,17 @@ export default function Page(props: Partial<GrowthSectionProps>) {
                         htmlFor="track-filter"
                         className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300"
                     >
-                        트랙 선택
+                        면접 유형
                     </label>
                     <select
                         id="track-filter"
                         value={selectedTrack}
-                        onChange={(e) => setSelectedTrack(e.target.value as TrackFilter)}
+                        onChange={(e) =>
+                            handleTrackChange(e.target.value as TrackAll)
+                        }
                         className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-800"
                     >
-                        {TRACK_OPTIONS.map((option) => (
+                        {TRACKALL.map((option) => (
                             <option key={option.value} value={option.value}>
                                 {option.label}
                             </option>
@@ -466,14 +427,18 @@ export default function Page(props: Partial<GrowthSectionProps>) {
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">평균 점수</span>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                            평균 점수
+                        </span>
                         <Target className="h-4 w-4 text-slate-400" />
                     </div>
                     <div className="mt-3 flex items-end gap-2">
                         <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                             {averageScore}
                         </span>
-                        <span className="pb-1 text-sm text-slate-500 dark:text-slate-400">/ 100</span>
+                        <span className="pb-1 text-sm text-slate-500 dark:text-slate-400">
+                            / 100
+                        </span>
                     </div>
                     <div className="mt-3">
                         <ChangeIndicator value={recentChange} />
@@ -482,7 +447,9 @@ export default function Page(props: Partial<GrowthSectionProps>) {
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">완료한 면접</span>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                            완료한 면접
+                        </span>
                         <MessageSquareText className="h-4 w-4 text-slate-400" />
                     </div>
                     <div className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">
@@ -491,25 +458,47 @@ export default function Page(props: Partial<GrowthSectionProps>) {
                     <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
                         {selectedTrack === "ALL"
                             ? "전체 면접 결과를 기준으로 성장 추이를 계산합니다."
-                            : `${TRACK_OPTIONS.find((option) => option.value === selectedTrack)?.label} 기준으로 성장 추이를 계산합니다.`}
+                            : `${
+                                TRACKALL.find(
+                                    (option) => option.value === selectedTrack
+                                )?.label
+                            } 기준으로 성장 추이를 계산합니다.`}
                     </p>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">보완 우선 영역</span>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                            답변 분석
+                        </span>
                         <TriangleAlert className="h-4 w-4 text-slate-400" />
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                        {weakPoints.slice(0, 2).map((item) => (
-                            <div key={item.category} className="flex items-center justify-between text-sm">
-                                <span className="text-slate-700 dark:text-slate-300">{item.category}</span>
-                                <span className="font-medium text-amber-600 dark:text-amber-400">
-                                    {item.averageScore}점
-                                </span>
+                    <div className="mt-3 space-y-3">
+                        {weakPointList.length > 0 ? (
+                            weakPointList.slice(0, 2).map((item) => (
+                                <div
+                                    key={item.label}
+                                    className="rounded-xl border border-amber-200/60 bg-amber-50/60 p-3 dark:border-amber-900/40 dark:bg-amber-950/20"
+                                >
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                            {item.label}
+                                        </span>
+                                        <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                                            {item.averageScore}점
+                                        </span>
+                                    </div>
+                                    <p className="mt-2 text-sm leading-5 text-slate-600 dark:text-slate-300">
+                                        {item.message}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="rounded-xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                                분석할 약점 데이터가 없습니다.
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>
@@ -523,20 +512,27 @@ export default function Page(props: Partial<GrowthSectionProps>) {
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             {selectedTrack === "ALL"
                                 ? "전체 면접 점수 흐름을 빠르게 확인할 수 있습니다."
-                                : `${TRACK_OPTIONS.find((option) => option.value === selectedTrack)?.label} 점수 흐름을 빠르게 확인할 수 있습니다.`}
+                                : `${
+                                    TRACKALL.find(
+                                        (option) => option.value === selectedTrack
+                                    )?.label
+                                } 점수 흐름을 빠르게 확인할 수 있습니다.`}
                         </p>
                     </div>
                     <TrendingUp className="h-5 w-5 text-slate-400" />
                 </div>
 
                 <div className="mt-6 h-72">
-                    {filteredScoreHistory.length > 0 ? (
+                    {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart
-                                data={filteredScoreHistory}
+                                data={chartData}
                                 margin={{ top: 10, right: 12, left: -20, bottom: 0 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.25)" />
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="rgba(148, 163, 184, 0.25)"
+                                />
                                 <XAxis
                                     dataKey="date"
                                     tickLine={false}
@@ -579,58 +575,62 @@ export default function Page(props: Partial<GrowthSectionProps>) {
                         </p>
                     </div>
                     <span className="text-sm text-slate-500 dark:text-slate-400">
-                        총 {filteredHistoryItems.length}건
+                        총 {data.totalElements}건
                     </span>
                 </div>
 
                 <div className="divide-y divide-slate-200 dark:divide-slate-800">
-                    {pagedHistoryItems.length > 0 ? (
-                        pagedHistoryItems.map((item) => {
-                            const statusMeta = getStatusMeta(item.status);
+                    {safeHistoryItems.length > 0 ? (
+                        safeHistoryItems.map((item) => {
+                            const statusMeta = getStatusMeta(item);
                             const scoreMeta = getScoreMeta(item.score);
 
                             return (
                                 <Link
                                     key={item.interviewId}
-                                    href={`/interview/result/${item.interviewId}`}
-                                    className="block px-5 py-4 transition hover:bg-slate-50 dark:hover:bg-slate-900/60"
+                                    href={`/interview/history/${item.interviewId}`}
                                 >
-                                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                        <div className="min-w-0">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <h4 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                                                    {item.title}
-                                                </h4>
-                                                <span className="rounded-full px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-300 dark:text-slate-300 dark:ring-slate-700">
-                                                    {TRACK_OPTIONS.find((option) => option.value === item.track)?.label}
-                                                </span>
-                                                <span
-                                                    className={`rounded-full px-2 py-1 text-xs font-medium ${statusMeta.className}`}
-                                                >
-                                                    {statusMeta.label}
-                                                </span>
-                                            </div>
+                                    <article className="px-5 py-4 transition hover:bg-slate-50 dark:hover:bg-slate-900/60">
+                                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h4 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                                        {item.title}
+                                                    </h4>
 
-                                            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
-                                                <span>{item.createdAt}</span>
-                                                <span>피드백 {item.feedbackCount}개</span>
-                                            </div>
-                                        </div>
+                                                    <span className="rounded-full px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-300 dark:text-slate-300 dark:ring-slate-700">
+                                                        {item.track.label}
+                                                    </span>
 
-                                        <div className="flex items-center gap-3">
-                                            <div className="text-right">
-                                                <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                                                    {item.score ?? "-"}
-                                                    {item.score != null ? "점" : ""}
+                                                    <span
+                                                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${statusMeta.badgeClass}`}
+                                                    >
+                                                        {statusMeta.icon}
+                                                        {statusMeta.label}
+                                                    </span>
                                                 </div>
-                                                <div
-                                                    className={`mt-1 inline-flex rounded-full px-2 py-1 text-xs font-medium ${scoreMeta.className}`}
-                                                >
-                                                    {scoreMeta.label}
+
+                                                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                                                    <span>{formatDisplayDate(item.createdAt)}</span>
+                                                    <span>문항 수 {item.questionCount}개</span>
                                                 </div>
                                             </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <div className="text-right">
+                                                    <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                                                        {item.score ?? "-"}
+                                                        {item.score != null ? "점" : ""}
+                                                    </div>
+                                                    <div
+                                                        className={`mt-1 inline-flex rounded-full px-2 py-1 text-xs font-medium ${scoreMeta.className}`}
+                                                    >
+                                                        {scoreMeta.label}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </article>
                                 </Link>
                             );
                         })
@@ -641,11 +641,14 @@ export default function Page(props: Partial<GrowthSectionProps>) {
                     )}
                 </div>
 
-                {filteredHistoryItems.length > 0 && (
+                {data.totalPages > 0 && (
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={setCurrentPage}
+                        onPageChange={(nextPage) => {
+                            if (nextPage < 1 || nextPage > totalPages) return;
+                            setPage(nextPage - 1);
+                        }}
                     />
                 )}
             </div>

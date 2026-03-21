@@ -4,6 +4,7 @@ import InterviewCarousel from "@/components/home/InterviewCarousel";
 import {Interview} from "@mockio/shared/src/api/home/Interview";
 import {interviewListApi} from "@/lib/api/home/InterviewListApi";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 
 export function ProfileCard({isLogin}: { isLogin: boolean }) {
@@ -39,7 +40,7 @@ export function ProfileCard({isLogin}: { isLogin: boolean }) {
             </p>
 
             <h3 className="mt-3 text-xl font-semibold text-[var(--text-primary)]">
-                진행중인 면접
+                  진행중인 면접
             </h3>
 
             {!isLogin ? (
