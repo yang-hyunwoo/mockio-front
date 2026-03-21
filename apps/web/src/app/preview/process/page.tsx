@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {cookies} from "next/headers";
 
 type PreviewQuestion = {
     phase: "워밍업" | "딥다이브" | "꼬리 질문" | "피드백";
@@ -40,34 +41,25 @@ const phases = [
     { key: "피드백", desc: "다음 액션으로 이어지는 요약을 제공합니다." },
 ] as const;
 
-export default function PreviewPage() {
+export default async function PreviewPage() {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("MOCKIO_SESSION");
+    const isLogin = !!session?.value;
+
     return (
         <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,var(--tint-mint),transparent_60%),radial-gradient(900px_500px_at_90%_10%,var(--tint-sky),transparent_55%),linear-gradient(180deg,var(--tint-cream),var(--tint-ice))] text-[var(--text-primary)]">
             <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:py-14">
                 {/* Top bar */}
                 <header className="flex items-center justify-between gap-6">
                     <Link
-                        href="/"
+                        href="/apps/web/public"
                         className="inline-flex items-center gap-2 text-sm font-semibold text-(--brand-secondary) hover:opacity-90"
                     >
                         <span className="text-base">←</span>
                         홈으로
                     </Link>
 
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href="/how-it-works"
-                            className="inline-flex h-10 items-center rounded-full border border-(--border-soft) px-4 text-sm font-medium text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
-                        >
-                            진행 방식 보기
-                        </Link>
-                        <a
-                            href="#start"
-                            className="inline-flex h-10 items-center rounded-full bg-(--brand-primary) px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
-                        >
-                            면접 시작
-                        </a>
-                    </div>
+
                 </header>
 
                 {/* Hero */}
@@ -85,12 +77,12 @@ export default function PreviewPage() {
                         </p>
 
                         <div className="flex flex-wrap items-center gap-4 pt-2">
-                            <a
-                                href="#samples"
+                            <Link
+                                href="/preview"
                                 className="inline-flex h-12 items-center justify-center rounded-full bg-(--brand-primary) px-6 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(53,90,122,0.25)] transition-colors hover:bg-[var(--brand-primary-hover)]"
                             >
                                 질문 예시 보기
-                            </a>
+                            </Link>
                             <Link
                                 href="/"
                                 className="inline-flex h-12 items-center justify-center rounded-full border border-(--border-soft) px-6 text-sm font-semibold text-(--brand-secondary) transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
@@ -131,18 +123,21 @@ export default function PreviewPage() {
                                 지금은 예시만 제공됩니다. 실제 세션에서는 답변 기록과 간단한 피드백을 함께 제공합니다.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-3">
-                                <Link
-                                    href="/"
-                                    className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-primary) px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
-                                >
-                                    면접 시작하기 (로그인)
-                                </Link>
-                                <Link
-                                    href="/how-it-works"
-                                    className="inline-flex h-11 items-center justify-center rounded-full border border-(--border-soft) px-5 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
-                                >
-                                    진행 방식 자세히
-                                </Link>
+                                {isLogin ? (
+                                    <Link
+                                        href="/interview"
+                                        className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-primary) px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
+                                    >
+                                        면접 시작하기
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href="http://localhost:9000/api/auth/v1/public/login"
+                                        className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-secondary) px-5 text-sm font-semibold text-white transition hover:opacity-90"
+                                    >
+                                        로그인
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -194,30 +189,12 @@ export default function PreviewPage() {
                     </div>
 
                     {/* Cutoff / tease */}
-                    <div className="mt-8 rounded-2xl border border-(--surface-soft-border) bg-(--surface-soft) p-6">
-                        <p className="text-sm text-(--brand-copy)">
-                            여기까지는 미리보기입니다. 실제 세션에서는 답변에 맞춘 꼬리 질문과 피드백 요약이 이어집니다.
-                        </p>
-                        <div className="mt-4 flex flex-wrap gap-3">
-                            <Link
-                                href="/"
-                                className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-primary) px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
-                            >
-                                면접 시작하기 (로그인)
-                            </Link>
-                            <Link
-                                href="/how-it-works"
-                                className="inline-flex h-11 items-center justify-center rounded-full border border-(--border-soft) px-5 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
-                            >
-                                진행 방식 자세히 보기
-                            </Link>
-                        </div>
-                    </div>
+
                 </section>
 
                 {/* Footer note */}
                 <footer className="pb-4 text-center text-xs text-(--brand-muted)">
-                    Mockio Preview · 정적 예시 페이지
+                    Mockio Preview
                 </footer>
             </main>
         </div>

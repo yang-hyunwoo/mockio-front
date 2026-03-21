@@ -82,7 +82,8 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
 
                             <div className="relative group">
                                 <Link
-                                    href="/mypage"
+                                    // href="/mypage"
+                                    href="/mypage/interview/history"
                                     className="text-(--brand-muted) transition-colors hover:text-foreground"
                                 >
                                     내 정보

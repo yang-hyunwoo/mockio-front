@@ -138,10 +138,11 @@ export default function StartCard({ isLogin }: StartCardProps) {
                         바로 시작할까요?
                     </p>
                 </div>
-
-                <div className="rounded-full bg-(--accent-soft) px-3 py-1 text-xs font-semibold text-(--brand-secondary)">
-                    5-10분
-                </div>
+                {isAuthed && (
+                    <div className="rounded-full bg-(--accent-soft) px-3 py-1 text-xs font-semibold text-(--brand-secondary)">
+                        설정에 맞춰 유연하게 진행
+                    </div>
+                )}
             </div>
 
             <div className="rounded-2xl border border-(--surface-soft-border) bg-(--surface-soft) p-4 text-sm text-(--brand-copy)">
@@ -166,7 +167,18 @@ export default function StartCard({ isLogin }: StartCardProps) {
                 </div>
             )}
 
-            <Login primaryLabel={isAuthed ? "면접 시작" : "면접 시작 (로그인)"} />
+            {isAuthed ? (
+                <button type="button"
+                    onClick={() => {
+                        window.location.href = "/interview";
+                    }}
+                    className="w-full rounded-2xl bg-(--brand-secondary) px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                    면접 시작
+                </button>
+            ) : (
+                <Login primaryLabel="로그인"/>
+            )}
         </div>
     );
 }

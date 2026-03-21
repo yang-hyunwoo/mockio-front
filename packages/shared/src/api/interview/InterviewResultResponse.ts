@@ -1,7 +1,7 @@
 import {EnumResponse} from "../EnumResponse";
 
 
-interface InterviewQuestionFeedbackItem {
+export interface InterviewQuestionFeedbackItem {
     id: number
     questionOrder: number
     question: string
@@ -11,6 +11,15 @@ interface InterviewQuestionFeedbackItem {
     type : EnumResponse,
     strengths: string[],
     improvements: string[]
+    dimensions : FeedbackDimensions
+    headline : string
+    improvementTags: string[]
+}
+
+interface FeedbackDimensions {
+    structure: number
+    clarity: number
+    specificity: number
 }
 
 export interface InterviewResultResponse {
@@ -30,4 +39,6 @@ export interface InterviewResultResponse {
     strengths: string[]
     improvements: string[]
     questions: InterviewQuestionFeedbackItem[]
+    feedbackDimensions : FeedbackDimensions,
+    endReason:EnumResponse
 }

@@ -27,6 +27,8 @@ export const InterviewListApi = async (
             track: item.track,
             difficulty: item.difficulty,
             feedbackStyle: item.feedbackStyle,
+            endReason: item.endReason,
+
         })),
         pageNumber: pageData.pageNumber,
         pageSize: pageData.pageSize,

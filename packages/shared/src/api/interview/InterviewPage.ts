@@ -12,4 +12,5 @@ export interface InterviewItem {
     track: EnumResponse
     difficulty: EnumResponse
     feedbackStyle: EnumResponse
+    endReason: EnumResponse
 }

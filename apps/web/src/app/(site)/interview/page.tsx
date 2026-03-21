@@ -8,6 +8,7 @@ import {
     Timer,
     MessageSquareWarning,
     BadgeCheck,
+    XCircle,
 } from "lucide-react"
 import Button from "@/components/Common/Button"
 import { InterviewQuestionApi } from "@/lib/api/interview/InterviewQuestionApi"
@@ -16,6 +17,8 @@ import { InterviewAnswerApi } from "@/lib/api/interview/InterviewAnswerApi"
 import { InterviewAnswerReadApi } from "@/lib/api/interview/InterviewAnswerReadApi"
 import { FeedbackDetailApi } from "@/lib/api/interview/FeedbackDetailApi"
 import { FeedbackResponse } from "@mockio/shared/src/api/interview/FeedbackDetail"
+import { InterviewExitApi } from "@/lib/api/interview/InterviewExitApi"
+
 
 export default function InterviewPage() {
     const [questions, setQuestions] = useState<InterviewQuestion[]>([])
@@ -23,6 +26,8 @@ export default function InterviewPage() {
     const [isInitializing, setIsInitializing] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
+    const [isTerminating, setIsTerminating] = useState(false)
+    const [isExited, setIsExited] = useState(false)
 
     const [answers, setAnswers] = useState<Record<number, string>>({})
     const [feedbackByQuestionId, setFeedbackByQuestionId] = useState<Record<number, FeedbackResponse>>({})
@@ -370,6 +375,43 @@ export default function InterviewPage() {
         await submitQuestion(current)
     }
 
+    const handleExitInterview = async () => {
+        if (!current) return
+        if (isSubmitting || isTerminating) return
+
+        const confirmed = window.confirm(
+            "면접을 종료하시겠습니까?\n현재 진행 상태는 저장되며, 완료되지 않은 면접으로 기록됩니다."
+        )
+
+        if (!confirmed) return
+
+        try {
+            setIsTerminating(true)
+
+            const success = await InterviewExitApi(current.interviewId)
+
+            if (!success) {
+                alert("면접 종료에 실패했습니다. 잠시 후 다시 시도해 주세요.")
+                return
+            }
+            if (intervalRef.current) {
+                window.clearInterval(intervalRef.current)
+                intervalRef.current = null
+            }
+
+            Object.values(feedbackPollingMapRef.current).forEach((timerId) => {
+                if (timerId) {
+                    window.clearInterval(timerId)
+                }
+            })
+
+            feedbackPollingMapRef.current = {}
+            setIsExited(true)
+        } finally {
+            setIsTerminating(false)
+        }
+    }
+
     useEffect(() => {
         if (!current) return
         if (isSubmitting) return
@@ -488,6 +530,20 @@ export default function InterviewPage() {
         )
     }
 
+    if (isExited) {
+        return (
+            <div className="mx-auto w-full max-w-6xl px-4 py-10">
+                <div className="rounded-3xl border border-white/10 bg-(--surface-glass-strong) p-8 text-center shadow-[0_24px_48px_rgba(20,30,50,0.12)]">
+                    <p className="text-sm text-(--brand-muted)">면접이 종료되었습니다.</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-foreground">면접을 중도 종료했습니다</h2>
+                    <p className="mt-3 text-sm text-(--brand-muted)">
+                        현재 진행 상태는 저장되며, 마이페이지 히스토리에서 다시 확인할 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
     if (isCompleted) {
         return (
             <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -523,20 +579,31 @@ export default function InterviewPage() {
                     </p>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-(--surface-glass-strong) px-4 py-3 shadow-[0_18px_40px_rgba(20,30,50,0.12)]">
-                    <div className="flex items-center gap-2 text-sm text-(--brand-muted)">
-                        <Timer className="h-4 w-4" />
-                        <span>{timerLabel}</span>
-                    </div>
+                <div className="flex flex-col items-stretch gap-3 sm:min-w-[180px]">
+                    <Button
+                        className="w-full rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/15 dark:text-red-300"
+                        onClick={handleExitInterview}
+                        disabled={isSubmitting || isTerminating}
+                    >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        {isTerminating ? "종료 중..." : "면접 종료"}
+                    </Button>
 
-                    <div className={`mt-1 text-xl font-semibold tabular-nums ${timerTextClass}`}>
-                        {formatMMSS(displaySec ?? 0)}
-                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-(--surface-glass-strong) px-4 py-3 shadow-[0_18px_40px_rgba(20,30,50,0.12)]">
+                        <div className="flex items-center gap-2 text-sm text-(--brand-muted)">
+                            <Timer className="h-4 w-4" />
+                            <span>{timerLabel}</span>
+                        </div>
 
-                    <p className="mt-1 text-xs text-(--brand-muted)">
-                        제한 {Math.floor((current.timeLimitSec ?? 0) / 60)}분{" "}
-                        {Math.floor((current.timeLimitSec ?? 0) % 60)}초
-                    </p>
+                        <div className={`mt-1 text-xl font-semibold tabular-nums ${timerTextClass}`}>
+                            {formatMMSS(displaySec ?? 0)}
+                        </div>
+
+                        <p className="mt-1 text-xs text-(--brand-muted)">
+                            제한 {Math.floor((current.timeLimitSec ?? 0) / 60)}분{" "}
+                            {Math.floor((current.timeLimitSec ?? 0) % 60)}초
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -656,7 +723,7 @@ export default function InterviewPage() {
                         <Button
                             className="rounded-xl"
                             onClick={submitCurrent}
-                            disabled={isSubmitting || isCurrentSubmitted || isCurrentExpired}
+                            disabled={isSubmitting || isCurrentSubmitted || isCurrentExpired || isTerminating}
                         >
                             <Send className="mr-2 h-4 w-4" />
                             {isCurrentSubmitted

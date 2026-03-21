@@ -2,6 +2,7 @@ import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
 import { AxiosRequestConfig } from "axios"
 import { InterviewQuestionViewModel } from "@mockio/shared/src/api/view/Interview/InterviewQuestionViewModel"
+import {RetryInterviewRequest} from "@mockio/shared/src/api/request/interview/RetryInterviewRequest";
 
 type LoadingType = "top" | "center" | "none"
 
@@ -18,16 +19,12 @@ export type InterviewQuestionReadResponse = {
     answerTimeSeconds: number
 }
 
-type StartInterviewRequest = {
-    idempotencyKey: string
-}
-
-export const InterviewQuestionApi = async (
-    payload: StartInterviewRequest
+export const RetryInterviewApi = async (
+    payload: RetryInterviewRequest
 ): Promise<InterviewQuestionReadResponse | null> => {
     try {
         const response = await api.post(
-            `${apiEndpoints.interview}/interviews/start-interview`,
+            `${apiEndpoints.interview}/interviews/retry-interview`,
             payload,
             {
                 meta: {
@@ -38,6 +35,6 @@ export const InterviewQuestionApi = async (
 
         return response.data.data ?? null
     } catch (error) {
-        return null
+        throw error
     }
 }

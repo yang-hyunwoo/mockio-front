@@ -1,4 +1,5 @@
 import Button from "@/components/Common/Button";
+import Link from "next/link";
 
 export default function HeroSection() {
     return (
@@ -16,14 +17,17 @@ export default function HeroSection() {
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
-                <a href="/preview"
+                <a href="/preview/process"
                     className="inline-flex h-12 items-center justify-center rounded-full bg-[var(--brand-primary)] px-6 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(53,90,122,0.25)] transition-colors hover:bg-[var(--brand-primary-hover)]"
                 >
-                    질문 미리보기
-                </a>
-                <Button variant="outline" size="lg" pill>
                     진행 방식 보기
-                </Button>
+                </a>
+                <Link
+                    href="/preview"
+                    className="inline-flex h-12 items-center justify-center rounded-full border border-(--border-soft) px-6 text-sm font-semibold text-(--brand-secondary) transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
+                >
+                    질문 예시 보기
+                </Link>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">

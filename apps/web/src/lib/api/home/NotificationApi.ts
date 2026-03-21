@@ -20,7 +20,6 @@ export const NotificationApi = async (
 
         return response.data.data ?? null
     } catch (error) {
-        console.error("면접 시작 실패", error)
         return null
     }
 }

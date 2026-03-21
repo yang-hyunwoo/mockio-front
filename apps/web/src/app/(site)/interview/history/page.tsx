@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { BadgeCheck, ChevronLeft, ChevronRight, Clock3, FileText, PlayCircle } from "lucide-react"
+import {BadgeCheck, ChevronLeft, ChevronRight, Clock3, FileText, PlayCircle, TriangleAlert} from "lucide-react"
 import { InterviewListApi } from "@/lib/api/interview/InterviewListApi"
 import { InterviewItem } from "@mockio/shared/src/api/interview/InterviewPage"
 import { PageResponse } from "@mockio/shared/src/api/PageResponse"
@@ -12,8 +12,20 @@ type InterviewStatusCode = "ACTIVE" | "ENDED"
 const PAGE_SIZE = 10
 
 const getStatusMeta = (status: InterviewStatusCode, item: InterviewItem) => {
+    const isUserExit = item.endReason?.code === "USER_EXIT"
     switch (status) {
         case "ENDED":
+            if (isUserExit) {
+                return {
+                    label: "중도 종료",
+                    badgeClass:
+                        "bg-amber-500/12 text-amber-600 ring-1 ring-amber-500/20 dark:text-amber-400 dark:ring-amber-400/20",
+                    buttonLabel: "상세 보기",
+                    buttonHref: `/interview/history/${item.id}`,
+                    icon: <TriangleAlert className="h-4 w-4" />,
+                }
+            }
+
             return {
                 label: "완료",
                 badgeClass:
@@ -22,6 +34,7 @@ const getStatusMeta = (status: InterviewStatusCode, item: InterviewItem) => {
                 buttonHref: `/interview/history/${item.id}`,
                 icon: <BadgeCheck className="h-4 w-4" />,
             }
+
         case "ACTIVE":
             return {
                 label: "진행중",
@@ -165,7 +178,7 @@ export default function InterviewListPage() {
                                                             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${statusMeta.badgeClass}`}
                                                         >
                                                             {statusMeta.icon}
-                                                            {item.status.label}
+                                                            {statusMeta.label}
                                                         </span>
 
                                                         <span className="text-xs text-(--brand-muted)">
