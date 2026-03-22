@@ -4,7 +4,8 @@ import Button from "@/components/Common/Button";
 
 export default function Login({ primaryLabel = "로그인하고 시작" }: { primaryLabel?: string }) {
     const handleLogin = () => {
-        window.location.href = "http://localhost:9000/api/auth/v1/public/login";
+        // window.location.href = "http://localhost:9000/api/auth/v1/public/login";
+        window.location.href = "/login";
     };
 
     return (
