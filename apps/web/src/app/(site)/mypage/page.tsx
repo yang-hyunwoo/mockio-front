@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { MyPageApi } from "@/lib/api/mypage/MyPageApi";
 import {
     Track,
@@ -13,14 +13,15 @@ import { MyPageResponse } from "@mockio/shared/src/api/mypage/MyPageResponse";
 import MyPageProfileSection from "@/components/mypage/MyPageProfileSection";
 import MyPagePreferenceSection from "@/components/mypage/MyPagePreferenceSection";
 import MyPageGuideSection from "@/components/mypage/MyPageGuideSection";
-import {UpdateInterviewPreferenceApi} from "@/lib/api/mypage/UpdateInterviewPreferenceApi";
-import {UpdateProfilePreferenceApi} from "@/lib/api/mypage/UpdateProfilePreferenceApi";
+import { UpdateInterviewPreferenceApi } from "@/lib/api/mypage/UpdateInterviewPreferenceApi";
+import { UpdateProfilePreferenceApi } from "@/lib/api/mypage/UpdateProfilePreferenceApi";
+import { useAuthStore } from "@/store/authStore";
 
 export interface ProfileForm {
     nickname: string;
     email: string;
     profileImageUrl: string;
-    profileImageId : number;
+    profileImageId: number;
 }
 
 export interface InterviewPreferenceForm {
@@ -35,14 +36,14 @@ const EMPTY_PROFILE: ProfileForm = {
     nickname: "",
     email: "",
     profileImageUrl: "",
-    profileImageId : 0,
+    profileImageId: 0,
 };
 
 const mapMyPageResponseToProfile = (data: MyPageResponse): ProfileForm => ({
     nickname: data.userProfileResponse.nickname ?? "",
     email: data.userProfileResponse.email ?? "",
     profileImageUrl: data.userProfileResponse.profileImageUrl ?? "",
-    profileImageId : data.userProfileResponse.profileImageId ?? 0,
+    profileImageId: data.userProfileResponse.profileImageId ?? 0,
 });
 
 const mapMyPageResponseToPreference = (
@@ -58,6 +59,13 @@ const mapMyPageResponseToPreference = (
 });
 
 export default function MyPage() {
+    const accessToken = useAuthStore((s) => s.accessToken);
+    const isInitialized = useAuthStore((s) => s.isInitialized);
+    const user = useAuthStore((s) => s.user);
+    const setUser = useAuthStore((s) => s.setUser);
+
+    const isAuth = !!accessToken;
+
     const [profile, setProfile] = useState<ProfileForm | null>(null);
     const [preference, setPreference] = useState<InterviewPreferenceForm | null>(null);
 
@@ -71,12 +79,35 @@ export default function MyPage() {
     const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
     const [profileImagePreview, setProfileImagePreview] = useState("");
 
+    const didFetchRef = useRef(false);
+
     useEffect(() => {
+        if (!isInitialized) {
+            return;
+        }
+
+        if (!isAuth) {
+            setLoading(false);
+            setProfile(EMPTY_PROFILE);
+            setPreference(null);
+            return;
+        }
+
+        if (didFetchRef.current) {
+            return;
+        }
+
+        didFetchRef.current = true;
+
+        let cancelled = false;
+
         const fetchMyPageData = async () => {
             try {
                 setLoading(true);
 
                 const response = await MyPageApi();
+
+                if (cancelled) return;
 
                 if (!response) {
                     setProfile(EMPTY_PROFILE);
@@ -87,20 +118,31 @@ export default function MyPage() {
                 const mappedProfile = mapMyPageResponseToProfile(response);
                 const mappedPreference = mapMyPageResponseToPreference(response);
 
-                setProfile(mappedProfile);
+                setProfile({
+                    ...mappedProfile,
+                    nickname: user?.username ?? mappedProfile.nickname,
+                    email: user?.email ?? mappedProfile.email,
+                });
                 setPreference(mappedPreference);
                 setProfileImagePreview(mappedProfile.profileImageUrl ?? "");
             } catch (error) {
+                if (cancelled) return;
+
                 console.error("마이페이지 정보 조회 실패", error);
                 setProfile(EMPTY_PROFILE);
                 setPreference(null);
             } finally {
+                if (cancelled) return;
                 setLoading(false);
             }
         };
 
         fetchMyPageData();
-    }, []);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isInitialized, isAuth, user?.username, user?.email]);
 
     useEffect(() => {
         return () => {
@@ -166,17 +208,35 @@ export default function MyPage() {
             if (profileImageFile) {
                 formData.append("profileImage", profileImageFile);
             }
-            const savedProfile = await UpdateProfilePreferenceApi(formData);
+
+            await UpdateProfilePreferenceApi(formData);
+
             setProfile((prev) =>
                 prev
                     ? {
-                          ...prev,
-                          profileImageUrl: prev.profileImageUrl,
-                      }
+                        ...prev,
+                        nickname: profile.nickname,
+                        email: profile.email,
+                        profileImageUrl: profileImagePreview || prev.profileImageUrl,
+                    }
                     : prev
             );
-            setProfileImagePreview(profileImagePreview);
 
+            setUser(
+                user
+                    ? {
+                        ...user,
+                        username: profile.nickname,
+                        email: profile.email,
+                    }
+                    : {
+                        id: null,
+                        username: profile.nickname,
+                        email: profile.email,
+                    }
+            );
+
+            setProfileImageFile(null);
             setProfileMessage("내 정보가 저장되었습니다.");
         } catch (error) {
             console.error("내 정보 저장 실패", error);
@@ -193,7 +253,6 @@ export default function MyPage() {
             setPreferenceSaving(true);
             setPreferenceMessage(null);
 
-            // TODO: 실제 API 연동
             await UpdateInterviewPreferenceApi(preference);
 
             setPreferenceMessage("면접 설정이 저장되었습니다.");
@@ -205,7 +264,7 @@ export default function MyPage() {
         }
     };
 
-    if (loading) {
+    if (!isInitialized || loading) {
         return (
             <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/70">
@@ -218,6 +277,26 @@ export default function MyPage() {
                         </h1>
                         <p className="mt-4 text-sm text-(--brand-muted)">
                             마이페이지 정보를 불러오는 중입니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (!isAuth) {
+        return (
+            <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+                <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/70">
+                    <div className="px-6 py-10 sm:px-8">
+                        <p className="text-sm font-semibold tracking-[0.18em] text-(--brand-primary)">
+                            MY PAGE
+                        </p>
+                        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
+                            내 정보 및 면접 설정
+                        </h1>
+                        <p className="mt-4 text-sm text-red-500">
+                            로그인 후 이용할 수 있습니다.
                         </p>
                     </div>
                 </div>

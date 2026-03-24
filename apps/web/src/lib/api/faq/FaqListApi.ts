@@ -1,5 +1,6 @@
-import {api, apiEndpoints} from "@mockio/shared/src";
+import {apiEndpoints} from "@mockio/shared/src";
 import {FaqItem} from "@mockio/shared/src/api/faq/FaqItem";
+import { api } from "@/lib/axios"
 
 export interface FaqListResponse {
     items: FaqItem[];

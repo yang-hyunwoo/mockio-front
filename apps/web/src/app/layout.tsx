@@ -5,6 +5,7 @@ import "./globals.css";
 import { GlobalLoadingProvider } from "@/components/providers/GlobalLoadingProivder";
 import GlobalTopLoadingBar from "@/components/Common/GlobalTopLoadingBar";
 import GlobalCenterLoading from "@/components/Common/GlobalCenterLoading";
+import AuthInitializer from "@/app/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +32,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <AuthInitializer>
       <GlobalLoadingProvider>
           <GlobalTopLoadingBar />
           <GlobalCenterLoading />
           {children}
       </GlobalLoadingProvider>
+      </AuthInitializer>
 
       </body>
     </html>

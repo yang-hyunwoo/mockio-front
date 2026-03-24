@@ -1,6 +1,5 @@
 import { api } from "@/lib/axios"
 import {apiEndpoints} from "@mockio/shared/src";
-import type { ProfileForm } from "@/app/(site)/mypage/page";
 
 export const UpdateProfilePreferenceApi = async (
     preference: FormData

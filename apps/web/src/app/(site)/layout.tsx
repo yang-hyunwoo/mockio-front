@@ -8,7 +8,7 @@ export default async function SiteLayout({children,}: { children: React.ReactNod
     const isLogin = !!session?.value;
     return (
         <HomeShell>
-            <HomeHeader isLogin={isLogin}/>
+            <HomeHeader />
             {children}
         </HomeShell>
     );

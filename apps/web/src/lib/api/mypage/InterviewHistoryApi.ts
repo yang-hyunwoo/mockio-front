@@ -1,5 +1,6 @@
 import { GrowthSectionProps } from "@mockio/shared/src/api/mypage/InterviewHistoryResponse";
-import { api, apiEndpoints } from "@mockio/shared/src";
+import { apiEndpoints } from "@mockio/shared/src";
+import { api } from "@/lib/axios"
 import { ApiResponse } from "@mockio/shared/src/api/ApiResponse";
 import {TrackAll} from "@mockio/shared/src/api/mypage/MyPageEnum";
 

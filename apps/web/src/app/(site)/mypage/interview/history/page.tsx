@@ -28,7 +28,8 @@ import {
     GrowthSectionProps,
     HistoryItem,
 } from "@mockio/shared/src/api/mypage/InterviewHistoryResponse";
-import {TRACKALL, TrackAll} from "@mockio/shared/src/api/mypage/MyPageEnum";
+import { TRACKALL, TrackAll } from "@mockio/shared/src/api/mypage/MyPageEnum";
+import { useAuthStore } from "@/store/authStore";
 
 type ChartItem = {
     interviewId: number;
@@ -60,8 +61,6 @@ const emptyData: GrowthSectionProps = {
     totalPages: 0,
     totalElements: 0,
 };
-
-
 
 function formatChartDate(value: string) {
     if (!value) return "-";
@@ -263,6 +262,10 @@ function Pagination({
 }
 
 export default function Page() {
+    const accessToken = useAuthStore((s) => s.accessToken);
+    const isInitialized = useAuthStore((s) => s.isInitialized);
+    const isAuth = !!accessToken;
+
     const [data, setData] = useState<GrowthSectionProps>(emptyData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -270,29 +273,47 @@ export default function Page() {
     const [page, setPage] = useState(0);
 
     useEffect(() => {
+        if (!isInitialized) {
+            return;
+        }
+
+        if (!isAuth) {
+            setLoading(false);
+            setError("로그인 후 이용할 수 있습니다.");
+            setData(emptyData);
+            return;
+        }
+
+        let cancelled = false;
+
         const fetchInterviewHistory = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
                 const track = selectedTrack === "ALL" ? undefined : selectedTrack;
-
-                // 현재 API 시그니처에 맞게 인자만 맞춰 주세요.
-                // 예: InterviewHistoryApi(page, track)
                 const result = await InterviewHistoryApi(page, track);
 
+                if (cancelled) return;
                 setData(result ?? emptyData);
             } catch (e) {
+                if (cancelled) return;
+
                 console.error(e);
                 setError("면접 히스토리를 불러오지 못했습니다.");
                 setData(emptyData);
             } finally {
+                if (cancelled) return;
                 setLoading(false);
             }
         };
 
         fetchInterviewHistory();
-    }, [page, selectedTrack]);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isInitialized, isAuth, page, selectedTrack]);
 
     const handleTrackChange = (value: TrackAll) => {
         setPage(0);
@@ -368,11 +389,21 @@ export default function Page() {
     const currentPage = data.number + 1;
     const totalPages = Math.max(1, data.totalPages || 1);
 
-    if (loading) {
+    if (!isInitialized || loading) {
         return (
             <section className="space-y-6">
                 <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
                     면접 히스토리를 불러오는 중입니다.
+                </div>
+            </section>
+        );
+    }
+
+    if (!isAuth) {
+        return (
+            <section className="space-y-6">
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center text-sm text-amber-700 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-300">
+                    로그인 후 이용할 수 있습니다.
                 </div>
             </section>
         );

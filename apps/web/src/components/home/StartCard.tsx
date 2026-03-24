@@ -2,25 +2,24 @@
 
 import { useEffect, useState } from "react";
 import Login from "@/components/Login";
-import { useAuth } from "@/lib/api/home/useAuth";
 import { interviewPreferenceApi } from "@/lib/api/home/interviewPreference";
 import { Preference } from "@mockio/shared/src/api/home/Preference";
-import {logoutApi} from "@/lib/api/home/LogoutApi";
+import { logoutApi } from "@/lib/api/home/LogoutApi";
+import { useAuthStore } from "@/store/authStore";
 
-interface StartCardProps {
-    isLogin: boolean;
-}
+export default function StartCard() {
+    const { user, accessToken, isInitialized, clearAuth } = useAuthStore();
 
-export default function StartCard({ isLogin }: StartCardProps) {
-    const { authState, username } = useAuth({ enabled: isLogin });
+    const username = user?.nickname;
+    const isAuthed = !!accessToken;
 
     const [pref, setPref] = useState<Preference | null>(null);
     const [prefLoading, setPrefLoading] = useState(false);
     const [prefError, setPrefError] = useState<string | null>(null);
 
-    const isAuthed = authState === "authenticated";
-
     useEffect(() => {
+        if (!isInitialized) return;
+
         if (!isAuthed) {
             setPref(null);
             setPrefError(null);
@@ -47,7 +46,6 @@ export default function StartCard({ isLogin }: StartCardProps) {
             })
             .catch((e) => {
                 if (cancelled) return;
-
                 setPref(null);
                 setPrefError(e?.message ?? "failed");
             })
@@ -59,14 +57,17 @@ export default function StartCard({ isLogin }: StartCardProps) {
         return () => {
             cancelled = true;
         };
-    }, [isAuthed]);
+    }, [isInitialized, isAuthed]);
 
     const handleLogout = async () => {
         try {
             await logoutApi();
-            window.location.href = "/";
         } catch (e) {
             console.error("로그아웃 실패", e);
+        } finally {
+            sessionStorage.setItem("skipAuthInitOnce", "true");
+            useAuthStore.getState().clearAuth();
+            window.location.href = "/";
         }
     };
 
@@ -90,7 +91,7 @@ export default function StartCard({ isLogin }: StartCardProps) {
 
     let sessionContent;
 
-    if (authState === "loading") {
+    if (!isInitialized) {
         sessionContent = <>로그인 상태 확인 중...</>;
     } else if (isAuthed) {
         sessionContent = (
@@ -108,9 +109,9 @@ export default function StartCard({ isLogin }: StartCardProps) {
                 </div>
 
                 <span className="font-semibold text-(--brand-secondary)">
-                    {username ? `${username} 님` : "로그인 사용자"}
+          {username ? `${username} 님` : "로그인 사용자"}
                     <br />
-                </span>
+        </span>
 
                 <span>바로 연습을 시작하실 수 있어요.</span>
             </>
@@ -138,6 +139,7 @@ export default function StartCard({ isLogin }: StartCardProps) {
                         바로 시작할까요?
                     </p>
                 </div>
+
                 {isAuthed && (
                     <div className="rounded-full bg-(--accent-soft) px-3 py-1 text-xs font-semibold text-(--brand-secondary)">
                         설정에 맞춰 유연하게 진행
@@ -154,21 +156,22 @@ export default function StartCard({ isLogin }: StartCardProps) {
                     <div className="flex items-center justify-between rounded-full border border-(--surface-soft-border) bg-(--surface-glass-strong) px-4 py-2">
                         <span>면접 유형 (난이도)</span>
                         <span className="font-semibold text-(--brand-secondary)">
-                            {interviewTypeText}
-                        </span>
+              {interviewTypeText}
+            </span>
                     </div>
 
                     <div className="flex items-center justify-between rounded-full border border-(--surface-soft-border) bg-(--surface-glass-strong) px-4 py-2">
                         <span>피드백 스타일</span>
                         <span className="font-semibold text-(--brand-secondary)">
-                            {feedbackStyleText}
-                        </span>
+              {feedbackStyleText}
+            </span>
                     </div>
                 </div>
             )}
 
             {isAuthed ? (
-                <button type="button"
+                <button
+                    type="button"
                     onClick={() => {
                         window.location.href = "/interview";
                     }}
@@ -177,7 +180,7 @@ export default function StartCard({ isLogin }: StartCardProps) {
                     면접 시작
                 </button>
             ) : (
-                <Login primaryLabel="로그인"/>
+                <Login primaryLabel="로그인" />
             )}
         </div>
     );

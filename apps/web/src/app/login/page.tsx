@@ -3,23 +3,45 @@
 import { FormEvent, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { LoginApi } from "@/lib/api/login/LoginApi"
+import { useAuthStore } from "@/store/authStore"
 
 export default function LoginPage() {
     const [loginId, setLoginId] = useState("")
     const [password, setPassword] = useState("")
     const [keepLogin, setKeepLogin] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        console.log({
-            loginId,
-            password,
-            keepLogin,
-        })
+        if (isSubmitting) return
 
-        // TODO:
-        // 로그인 API 연결
+        setIsSubmitting(true)
+        setErrorMessage("")
+
+        const payload = {
+            email: loginId,
+            password: password,
+        }
+
+        try {
+            const result = await LoginApi(payload)
+
+            if (result?.accessToken) {
+                useAuthStore.getState().setAccessToken(result.accessToken)
+                window.location.href = "/"
+            }
+        } catch (error: any) {
+            const message =
+                error?.response?.data?.message ||
+                "로그인에 실패했습니다."
+
+            setErrorMessage(message)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const handleGoogleLogin = () => {
@@ -33,8 +55,6 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center px-4">
             <div className="w-full max-w-[420px]">
-
-                {/* ===== 로고 영역 ===== */}
                 <div className="mb-12 flex flex-col items-center">
                     <div className="relative w-[220px] h-[220px]">
                         <Image
@@ -47,12 +67,8 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                {/* ===== 로그인 카드 ===== */}
                 <div className="rounded-2xl border border-[#d9d9d9] bg-white px-6 py-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
-
                     <form onSubmit={handleSubmit} className="space-y-4">
-
-                        {/* 아이디 */}
                         <input
                             type="text"
                             placeholder="아이디"
@@ -61,7 +77,6 @@ export default function LoginPage() {
                             className="h-12 w-full rounded-xl border border-[#d9d9d9] px-4 text-[15px] outline-none transition focus:border-[#3f7a97] focus:ring-2 focus:ring-[#3f7a97]/20"
                         />
 
-                        {/* 비밀번호 */}
                         <input
                             type="password"
                             placeholder="비밀번호"
@@ -70,7 +85,6 @@ export default function LoginPage() {
                             className="h-12 w-full rounded-xl border border-[#d9d9d9] px-4 text-[15px] outline-none transition focus:border-[#3f7a97] focus:ring-2 focus:ring-[#3f7a97]/20"
                         />
 
-                        {/* 로그인 유지 */}
                         <label className="flex items-center gap-2 text-[14px] text-[#444]">
                             <input
                                 type="checkbox"
@@ -81,21 +95,23 @@ export default function LoginPage() {
                             로그인 상태 유지
                         </label>
 
-                        {/* 로그인 버튼 */}
                         <button
                             type="submit"
-                            className="h-[54px] w-full rounded-xl bg-[#3f7a97] text-[17px] font-semibold text-white transition hover:bg-[#356a84] active:scale-[0.98]"
+                            disabled={isSubmitting}
+                            className="h-[54px] w-full rounded-xl bg-[#3f7a97] text-[17px] font-semibold text-white transition hover:bg-[#356a84] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            로그인
+                            {isSubmitting ? "로그인 중..." : "로그인"}
                         </button>
+
+                        {errorMessage && (
+                            <p className="mt-2 text-center text-sm text-red-500">
+                                {errorMessage}
+                            </p>
+                        )}
                     </form>
 
-                    {/* 구분선 */}
                     <div className="my-6 border-t border-[#e5e7eb]" />
 
-                    {/* ===== 소셜 로그인 ===== */}
-
-                    {/* 구글 */}
                     <button
                         type="button"
                         onClick={handleGoogleLogin}
@@ -111,7 +127,6 @@ export default function LoginPage() {
                         </div>
                     </button>
 
-                    {/* 네이버 */}
                     <button
                         type="button"
                         onClick={handleNaverLogin}
@@ -128,7 +143,6 @@ export default function LoginPage() {
                     </button>
                 </div>
 
-                {/* ===== 하단 링크 ===== */}
                 <div className="mt-6 flex justify-center gap-3 text-[13px] text-[#8c8c9a]">
                     <Link href="/find-password" className="hover:text-[#666]">
                         비밀번호 찾기

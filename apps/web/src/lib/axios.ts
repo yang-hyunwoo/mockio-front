@@ -1,1 +1,1 @@
-export { api } from "../../../../packages/shared/src/axios";
+export { api } from "@/store/axios";

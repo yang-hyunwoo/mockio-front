@@ -1,9 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/Common/Button";
 import NotificationDropdown from "@/components/home/NotificationDropdown";
+import { useAuthStore } from "@/store/authStore";
 
-export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
+export default function HomeHeader() {
+    const accessToken = useAuthStore((s) => s.accessToken);
+    const isInitialized = useAuthStore((s) => s.isInitialized);
+    const isLogin = !!accessToken;
+
     return (
         <header className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-6">
@@ -34,7 +41,7 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
                         FAQ
                     </Link>
 
-                    {isLogin && (
+                    {isInitialized && isLogin && (
                         <>
                             <div className="relative group">
                                 <Button
@@ -51,10 +58,7 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
                                 </Button>
 
                                 <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
-                                    <div
-                                        className="min-w-55 overflow-hidden rounded-2xl border border-white/30
-                                                   bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl"
-                                    >
+                                    <div className="min-w-55 overflow-hidden rounded-2xl border border-white/30 bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl">
                                         <Link
                                             href="/interview"
                                             className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
@@ -91,14 +95,11 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
                                         </span>
                                     }
                                 >
-                                   내 정보
+                                    내 정보
                                 </Button>
 
                                 <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
-                                    <div
-                                        className="min-w-55 overflow-hidden rounded-2xl border border-white/30
-                                                   bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl"
-                                    >
+                                    <div className="min-w-55 overflow-hidden rounded-2xl border border-white/30 bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl">
                                         <Link
                                             href="/mypage"
                                             className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
@@ -117,20 +118,19 @@ export default function HomeHeader({ isLogin }: { isLogin: boolean }) {
                                         >
                                             면접 기록
                                             <p className="mt-1 block text-xs text-gray-500">
-                                               면접 평가 내역을 확인 합니다.
+                                                면접 평가 내역을 확인 합니다.
                                             </p>
                                         </Link>
                                     </div>
                                 </div>
                             </div>
-
                         </>
                     )}
                 </nav>
             </div>
 
             <div className="flex items-center gap-6">
-                {isLogin ? (
+                {isInitialized && isLogin ? (
                     <>
                         <NotificationDropdown />
                         <Link
