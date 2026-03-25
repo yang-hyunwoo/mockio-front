@@ -4,6 +4,7 @@ import PreviewSection from "@/components/home/PreviewSection";
 import NoticeProfileSection from "@/components/home/NoticeProfileSection";
 import { getNotice } from "@/lib/api/home/noticeApi";
 import {ProfileCard} from "@/components/home/ProfileCard";
+
 export default async function Home() {
     const notice = await getNotice();
   return (

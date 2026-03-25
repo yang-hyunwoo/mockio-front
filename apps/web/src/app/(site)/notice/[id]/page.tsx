@@ -1,5 +1,6 @@
 
 import { noticeDetailApi } from "@/lib/api/notice/noticeDetailApi"
+
 export default async function NoticeDetailPage({params}: {
     params: Promise<{ id: string }>
 }) {

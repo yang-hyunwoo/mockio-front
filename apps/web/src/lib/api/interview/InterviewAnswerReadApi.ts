@@ -1,12 +1,7 @@
 import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
 import {InterviewAnswerDetailResponse} from "@mockio/shared/src/api/interview/InterviewAnswerDetailResponse";
-
-
-type ApiResponse<T> = {
-    message: string
-    data: T
-}
+import {ApiResponse} from "@mockio/shared/src/api/ApiResponse";
 
 export async function InterviewAnswerReadApi(questionId: number): Promise<InterviewAnswerDetailResponse | null> {
     try {

@@ -11,7 +11,6 @@ export const InterviewHistoryApi = async (
 
     const params: any = { page };
 
-    // 👉 ALL이 아닐 때만 추가
     if (track && track !== "ALL") {
         params.track = track;
     }

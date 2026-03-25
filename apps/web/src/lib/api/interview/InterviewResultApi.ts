@@ -1,10 +1,7 @@
 import { api } from "@/lib/axios"
 import { apiEndpoints } from "@/lib/api"
 import {InterviewResultResponse} from "@mockio/shared/src/api/interview/InterviewResultResponse";
-
-interface ApiResponse<T> {
-    data: T
-}
+import {ApiResponse} from "@mockio/shared/src/api/ApiResponse";
 
 export const InterviewResultApi = async (
     interviewId: number

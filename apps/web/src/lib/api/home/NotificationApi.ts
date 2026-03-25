@@ -10,7 +10,6 @@ export type NotificationReadResponseType = {
 }
 
 
-
 export const NotificationApi = async (
 ): Promise<NotificationReadResponseType | null> => {
     try {

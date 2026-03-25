@@ -1,7 +1,6 @@
 import { apiEndpoints } from "@/lib/api";
 import {MainNotice} from "@mockio/shared/src/api/home/MainNotice";
 
-
 export const getNotice = async (): Promise<MainNotice> => {
     if (!apiEndpoints.notiPublic) return null;
     const res = await fetch(`${apiEndpoints.notiPublic}/notice/detail`, {

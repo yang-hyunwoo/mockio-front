@@ -11,4 +11,3 @@ export const ChangePasswordApi = async (
         throw error;
     }
 }
-

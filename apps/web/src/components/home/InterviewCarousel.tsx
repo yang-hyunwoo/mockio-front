@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react"
 import {Interview} from "@mockio/shared/src/api/home/Interview";
 import Link from "next/link";
+
 interface Props {
     interviews: Interview[]
     autoplayMs?: number

@@ -11,7 +11,6 @@ type LoadingAxiosRequestConfig = AxiosRequestConfig & {
     }
 }
 
-
 export async function FeedbackDetailApi(questionId: number): Promise<FeedbackResponse | null> {
     try {
         const response = await api.get(

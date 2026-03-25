@@ -4,7 +4,7 @@ export interface NoticeDetail {
     createdAt: string
     noticeType: string
     pinned: boolean
-    content: string //  HTML (Cloudinary <img> 포함)
+    content: string
     prevId?: number | null
     nextId?: number | null
 }

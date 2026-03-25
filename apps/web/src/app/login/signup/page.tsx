@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { SignupApi } from "@/lib/api/login/SignupApi"
+
 export default function SignupPage() {
     const [email, setEmail] = useState("")
     const [nickname, setNickname] = useState("")

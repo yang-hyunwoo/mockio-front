@@ -4,7 +4,6 @@ import {SignupRequest} from "@mockio/shared/src/api/login/SignupRequest";
 import {ApiResponse} from "@mockio/shared/src/api/ApiResponse";
 import {SignupResponse} from "@mockio/shared/src/api/login/SignupResponse";
 
-
 export const SignupApi = async (
     payload: SignupRequest
 ): Promise<SignupResponse | null> => {

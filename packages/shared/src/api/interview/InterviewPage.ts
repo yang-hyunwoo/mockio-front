@@ -1,6 +1,5 @@
 import {EnumResponse} from "../EnumResponse";
 
-
 export interface InterviewItem {
     id: number
     title: string
