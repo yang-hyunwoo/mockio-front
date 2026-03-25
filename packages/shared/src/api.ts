@@ -16,7 +16,7 @@ export const apiEndpoints = {
   ai: `${apiBaseUrl}/ai/${version}`,
   auth: `${apiBaseUrl}/auth/${version}`,
   feedback: `${apiBaseUrl}/feedback/${version}`,
-  noti: `${apiBaseUrl}/noti/${version}`,
+  noti: `${apiBaseUrl}/notice/${version}`,
   inquiry: `${apiBaseUrl}/inquiry/${version}`,
   faq: `${apiBaseUrl}/faq/${version}`,
   interview: `${apiBaseUrl}/interview/${version}`,
@@ -25,7 +25,7 @@ export const apiEndpoints = {
   notificationPublic: `${apiBaseUrl}/notification/${version}/public`,
   chatPublic: `${apiBaseUrl}/chat/${version}/public`,
   aiPublic: `${apiBaseUrl}/ai/${version}/public`,
-  notiPublic: `${apiBaseUrl}/noti/${version}/public`,
+  notiPublic: `${apiBaseUrl}/notice/${version}/public`,
   faqPublic: `${apiBaseUrl}/faq/${version}/public`,
   authPublic: `${apiBaseUrl}/auth/${version}/public`,
 };

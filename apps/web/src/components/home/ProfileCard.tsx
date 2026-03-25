@@ -15,9 +15,6 @@ export function ProfileCard() {
     const isLogin = !!accessToken;
 
     useEffect(() => {
-        console.log(accessToken);
-        console.log(isInitialized);
-        console.log("isLogin::",isLogin);
         let cancelled = false;
 
         if (!isInitialized) return;

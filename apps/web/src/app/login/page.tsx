@@ -45,11 +45,11 @@ export default function LoginPage() {
     }
 
     const handleGoogleLogin = () => {
-        console.log("google login")
+        window.location.href = `http://localhost:9080/api/auth/v1/oauth2/authorization/google`;
     }
 
     const handleNaverLogin = () => {
-        console.log("naver login")
+        window.location.href = `http://localhost:9080/api/auth/v1/oauth2/authorization/naver`;
     }
 
     return (
@@ -70,8 +70,8 @@ export default function LoginPage() {
                 <div className="rounded-2xl border border-[#d9d9d9] bg-white px-6 py-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <input
-                            type="text"
-                            placeholder="아이디"
+                            type="email"
+                            placeholder="이메일"
                             value={loginId}
                             onChange={(e) => setLoginId(e.target.value)}
                             className="h-12 w-full rounded-xl border border-[#d9d9d9] px-4 text-[15px] outline-none transition focus:border-[#3f7a97] focus:ring-2 focus:ring-[#3f7a97]/20"
@@ -144,12 +144,8 @@ export default function LoginPage() {
                 </div>
 
                 <div className="mt-6 flex justify-center gap-3 text-[13px] text-[#8c8c9a]">
-                    <Link href="/find-password" className="hover:text-[#666]">
+                    <Link href="/password/find" className="hover:text-[#666]">
                         비밀번호 찾기
-                    </Link>
-                    <span>|</span>
-                    <Link href="/find-id" className="hover:text-[#666]">
-                        아이디 찾기
                     </Link>
                     <span>|</span>
                     <Link href="/login/signup" className="hover:text-[#666]">

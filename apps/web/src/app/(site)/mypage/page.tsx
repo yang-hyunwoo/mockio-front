@@ -82,35 +82,35 @@ export default function MyPage() {
     const didFetchRef = useRef(false);
 
     useEffect(() => {
+
         if (!isInitialized) {
+            console.log("return: not initialized");
             return;
         }
 
         if (!isAuth) {
+            console.log("return: not auth");
             setLoading(false);
-            setProfile(EMPTY_PROFILE);
+            setProfile(null);
             setPreference(null);
             return;
         }
 
-        if (didFetchRef.current) {
-            return;
-        }
-
-        didFetchRef.current = true;
-
         let cancelled = false;
 
         const fetchMyPageData = async () => {
+            console.log("fetchMyPageData start");
+
             try {
                 setLoading(true);
 
                 const response = await MyPageApi();
+                console.log("MyPageApi response", response);
 
                 if (cancelled) return;
 
                 if (!response) {
-                    setProfile(EMPTY_PROFILE);
+                    setProfile(null);
                     setPreference(null);
                     return;
                 }
@@ -120,7 +120,7 @@ export default function MyPage() {
 
                 setProfile({
                     ...mappedProfile,
-                    nickname: user?.username ?? mappedProfile.nickname,
+                    nickname: user?.nickname ?? mappedProfile.nickname,
                     email: user?.email ?? mappedProfile.email,
                 });
                 setPreference(mappedPreference);
@@ -129,7 +129,7 @@ export default function MyPage() {
                 if (cancelled) return;
 
                 console.error("마이페이지 정보 조회 실패", error);
-                setProfile(EMPTY_PROFILE);
+                setProfile(null);
                 setPreference(null);
             } finally {
                 if (cancelled) return;
@@ -142,7 +142,8 @@ export default function MyPage() {
         return () => {
             cancelled = true;
         };
-    }, [isInitialized, isAuth, user?.username, user?.email]);
+    }, [isInitialized, isAuth]);
+
 
     useEffect(() => {
         return () => {
@@ -226,12 +227,12 @@ export default function MyPage() {
                 user
                     ? {
                         ...user,
-                        username: profile.nickname,
+                        nickname: profile.nickname,
                         email: profile.email,
                     }
                     : {
                         id: null,
-                        username: profile.nickname,
+                        nickname: profile.nickname,
                         email: profile.email,
                     }
             );

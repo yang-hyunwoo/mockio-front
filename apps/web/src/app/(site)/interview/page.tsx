@@ -297,9 +297,14 @@ export default function InterviewPage() {
 
             const idempotencyKey = createIdempotencyKey(question.interviewId, question.id)
             const questionStartedAt = startedAtByQuestionId[question.id]
-            const durationSeconds = questionStartedAt
+            const rawDurationSeconds = questionStartedAt
                 ? Math.floor((Date.now() - questionStartedAt) / 1000)
                 : 0
+
+            const timeLimitSec = question.timeLimitSec ?? rawDurationSeconds
+            const durationSeconds = options?.autoSubmit
+                ? Math.min(rawDurationSeconds, timeLimitSec)
+                : rawDurationSeconds
 
             setSubmittedDurationByQuestionId((prev) => ({
                 ...prev,
@@ -685,10 +690,8 @@ export default function InterviewPage() {
                                 onClick={index === questions.length - 1 ? submitCurrent : goNext}
                                 disabled={!isCurrentSubmitted && index !== questions.length - 1}
                             >
-                                {index === questions.length - 1 ? "면접 완료" : "다음"}
-                                {index !== questions.length - 1 && (
+                               다음
                                     <ChevronRight className="ml-1 h-4 w-4" />
-                                )}
                             </Button>
                         </div>
                     </div>

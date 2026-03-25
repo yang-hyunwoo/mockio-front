@@ -10,7 +10,7 @@ import { useAuthStore } from "@/store/authStore";
 export default function StartCard() {
     const { user, accessToken, isInitialized, clearAuth } = useAuthStore();
 
-    const username = user?.nickname;
+    const nickname = user?.nickname;
     const isAuthed = !!accessToken;
 
     const [pref, setPref] = useState<Preference | null>(null);
@@ -109,7 +109,7 @@ export default function StartCard() {
                 </div>
 
                 <span className="font-semibold text-(--brand-secondary)">
-          {username ? `${username} 님` : "로그인 사용자"}
+          {nickname ? `${nickname} 님` : "로그인 사용자"}
                     <br />
         </span>
 

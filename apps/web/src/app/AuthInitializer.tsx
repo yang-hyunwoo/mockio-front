@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/axios";
 import { apiEndpoints } from "@mockio/shared/src";
 
-const PRIVATE_PATHS = ["/mypage", "/interview","/"];
+const EXCLUDED_PATHS = ["/login", "/social/callback", "/signup","/password/reset","/password"];
 
 export default function AuthInitializer({
                                             children,
@@ -14,22 +14,22 @@ export default function AuthInitializer({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-
     const setAccessToken = useAuthStore((s) => s.setAccessToken);
     const setUser = useAuthStore((s) => s.setUser);
     const setInitialized = useAuthStore((s) => s.setInitialized);
     const clearAuth = useAuthStore((s) => s.clearAuth);
 
     useEffect(() => {
-        const isPrivatePath = PRIVATE_PATHS.some((path) =>
+        const isExcludedPath = EXCLUDED_PATHS.some((path) =>
             pathname.startsWith(path)
         );
 
-        // 보호 페이지가 아니면 refresh 자체를 시도하지 않음
-        if (!isPrivatePath) {
+        if (isExcludedPath) {
             setInitialized(true);
             return;
         }
+
+        setInitialized(false);
 
         const initAuth = async () => {
             try {
@@ -63,7 +63,7 @@ export default function AuthInitializer({
                 setUser({
                     id: meData?.id ?? null,
                     email: meData?.email ?? null,
-                    username: meData?.username ?? meData?.nickname ?? null,
+                    nickname: meData?.nickname ?? null,
                 });
             } catch (e) {
                 clearAuth();

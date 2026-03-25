@@ -41,6 +41,8 @@ function emitLoadingEnd(type: Exclude<LoadingType, "none">) {
     );
 }
 
+
+
 function getLoadingType(
     config?: AxiosRequestConfig | InternalAxiosRequestConfig
 ): LoadingType {
@@ -62,7 +64,6 @@ api.interceptors.request.use(
         }
 
         const accessToken = useAuthStore.getState().accessToken;
-        console.log("accessToken:::",accessToken);
         if (accessToken) {
             config.headers = config.headers ?? {};
             config.headers.Authorization = `Bearer ${accessToken}`;

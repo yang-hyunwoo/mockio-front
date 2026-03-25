@@ -39,10 +39,6 @@ export default function SignupSuccessClient() {
                     가입이 정상적으로 완료되었습니다.
                 </p>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                    잠시 후 로그인 페이지로 이동합니다.
-                </p>
-
                 {/* 수동 이동 버튼 */}
                 <button
                     onClick={() => router.replace("/login")}

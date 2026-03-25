@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/Common/Button";
@@ -11,144 +12,372 @@ export default function HomeHeader() {
     const isInitialized = useAuthStore((s) => s.isInitialized);
     const isLogin = !!accessToken;
 
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileInterviewOpen, setMobileInterviewOpen] = useState(false);
+    const [mobileMyInfoOpen, setMobileMyInfoOpen] = useState(false);
+
+    const closeMobileMenu = () => {
+        setMobileMenuOpen(false);
+        setMobileInterviewOpen(false);
+        setMobileMyInfoOpen(false);
+    };
+
+    useEffect(() => {
+        if (!mobileMenuOpen) return;
+
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                closeMobileMenu();
+            }
+        };
+
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        window.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            window.removeEventListener("keydown", handleEscape);
+        };
+    }, [mobileMenuOpen]);
+
     return (
-        <header className="flex flex-wrap items-center justify-between gap-6">
-            <div className="flex items-center gap-6">
-                <div>
-                    <Link href="/" className="inline-flex items-center">
+        <>
+            <header className="flex items-center justify-between gap-3 md:gap-6">
+                <div className="flex min-w-0 items-center gap-3 md:gap-6">
+                    <Link href="/" className="inline-flex shrink-0 items-center">
                         <Image
                             src="/branding/mockio-text-logo.png"
                             alt="Mockio"
                             width={120}
                             height={24}
                             priority
+                            className="h-auto w-[100px] sm:w-[120px]"
                         />
                     </Link>
+
+                    <nav className="hidden items-center gap-4 text-sm font-medium lg:flex">
+                        <Link
+                            href="/notice"
+                            className="text-(--brand-muted) transition-colors hover:text-foreground"
+                        >
+                            공지사항
+                        </Link>
+
+                        <Link
+                            href="/faq"
+                            className="text-(--brand-muted) transition-colors hover:text-foreground"
+                        >
+                            FAQ
+                        </Link>
+
+                        {isInitialized && isLogin && (
+                            <>
+                                <div className="relative group">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-auto px-0 font-medium text-(--brand-muted) hover:text-foreground"
+                                        rightIcon={
+                                            <span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">
+                                                ▾
+                                            </span>
+                                        }
+                                    >
+                                        AI 면접
+                                    </Button>
+
+                                    <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
+                                        <div className="min-w-56 overflow-hidden rounded-2xl border border-white/30 bg-white/90 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90">
+                                            <Link
+                                                href="/interview"
+                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            >
+                                                면접 시작
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    새로운 AI 면접을 시작합니다
+                                                </p>
+                                            </Link>
+
+                                            <div className="h-px bg-black/5 dark:bg-white/10" />
+
+                                            <Link
+                                                href="/interview/history"
+                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            >
+                                                면접 내역
+                                                <p className="mt-1 block text-xs text-gray-500">
+                                                    이전 면접 결과와 진행 내역을 확인합니다
+                                                </p>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="relative group">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-auto px-0 font-medium text-(--brand-muted) hover:text-foreground"
+                                        rightIcon={
+                                            <span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">
+                                                ▾
+                                            </span>
+                                        }
+                                    >
+                                        내 정보
+                                    </Button>
+
+                                    <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
+                                        <div className="min-w-56 overflow-hidden rounded-2xl border border-white/30 bg-white/90 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90">
+                                            <Link
+                                                href="/mypage"
+                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            >
+                                                내 정보
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    면접 정보 및 내 정보를 수정합니다
+                                                </p>
+                                            </Link>
+
+                                            <div className="h-px bg-black/5 dark:bg-white/10" />
+
+                                            <Link
+                                                href="/mypage/interview/history"
+                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            >
+                                                면접 기록
+                                                <p className="mt-1 block text-xs text-gray-500">
+                                                    면접 평가 내역을 확인합니다
+                                                </p>
+                                            </Link>
+                                            <Link
+                                                href="/mypage/authorize"
+                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            >
+                                                보안
+                                                <p className="mt-1 block text-xs text-gray-500">
+                                                    비밀번호 변경 및 회원 탈퇴를 합니다.
+                                                </p>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </nav>
                 </div>
 
-                <nav className="hidden items-center gap-5 text-sm font-medium lg:flex">
-                    <Link
-                        href="/notice"
-                        className="text-(--brand-muted) transition-colors hover:text-foreground"
-                    >
-                        공지사항
-                    </Link>
-
-                    <Link
-                        href="/faq"
-                        className="text-(--brand-muted) transition-colors hover:text-foreground"
-                    >
-                        FAQ
-                    </Link>
-
+                <div className="hidden items-center gap-3 sm:gap-4 lg:flex">
                     {isInitialized && isLogin && (
                         <>
-                            <div className="relative group">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-auto px-0 font-medium text-(--brand-muted) hover:text-foreground"
-                                    rightIcon={
-                                        <span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">
-                                            ▾
-                                        </span>
-                                    }
-                                >
-                                    AI 면접
-                                </Button>
-
-                                <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
-                                    <div className="min-w-55 overflow-hidden rounded-2xl border border-white/30 bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl">
-                                        <Link
-                                            href="/interview"
-                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
-                                        >
-                                            면접 시작
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                새로운 AI 면접을 시작합니다
-                                            </p>
-                                        </Link>
-
-                                        <div className="h-px bg-black/5" />
-
-                                        <Link
-                                            href="/interview/history"
-                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
-                                        >
-                                            면접 기록
-                                            <p className="mt-1 block text-xs text-gray-500">
-                                                이전 면접 결과와 진행 내역을 확인합니다
-                                            </p>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="relative group">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-auto px-0 font-medium text-(--brand-muted) hover:text-foreground"
-                                    rightIcon={
-                                        <span className="text-[10px] opacity-70 transition-transform group-hover:rotate-180">
-                                            ▾
-                                        </span>
-                                    }
-                                >
-                                    내 정보
-                                </Button>
-
-                                <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
-                                    <div className="min-w-55 overflow-hidden rounded-2xl border border-white/30 bg-white/65 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl">
-                                        <Link
-                                            href="/mypage"
-                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
-                                        >
-                                            내 정보
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                면접 정보 및 내 정보를 수정 합니다.
-                                            </p>
-                                        </Link>
-
-                                        <div className="h-px bg-black/5" />
-
-                                        <Link
-                                            href="/mypage/interview/history"
-                                            className="block px-4 py-3 text-sm transition-colors hover:bg-white/50"
-                                        >
-                                            면접 기록
-                                            <p className="mt-1 block text-xs text-gray-500">
-                                                면접 평가 내역을 확인 합니다.
-                                            </p>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                            <NotificationDropdown />
+                            <Link
+                                href="/interview"
+                                className="inline-flex h-10 items-center rounded-full bg-[var(--brand-primary)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
+                            >
+                                면접 시작
+                            </Link>
                         </>
                     )}
-                </nav>
-            </div>
+                </div>
 
-            <div className="flex items-center gap-6">
-                {isInitialized && isLogin ? (
-                    <>
-                        <NotificationDropdown />
-                        <Link
-                            href="/interview"
-                            className="inline-flex h-10 items-center rounded-full bg-(--brand-primary) px-4 text-sm font-semibold text-white transition-colors hover:bg-(--brand-primary-hover)"
-                        >
-                            면접 시작
-                        </Link>
-                    </>
-                ) : (
-                    <Link
-                        href="/preview"
-                        className="inline-flex h-10 items-center rounded-full border border-(--border-soft) px-4 text-sm font-medium text-(--brand-secondary) transition-colors hover:border-(--brand-secondary) hover:bg-(--surface-glass)"
-                    >
-                        게스트 미리보기
-                    </Link>
-                )}
-            </div>
-        </header>
+                <button
+                    type="button"
+                    aria-label="메뉴 열기"
+                    aria-expanded={mobileMenuOpen}
+                    onClick={() => setMobileMenuOpen(true)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-(--border-soft) bg-white/70 text-foreground shadow-sm transition hover:bg-white dark:bg-zinc-900/70 dark:hover:bg-zinc-900 lg:hidden"
+                >
+                    <span className="text-lg leading-none">☰</span>
+                </button>
+            </header>
+
+            {mobileMenuOpen && (
+                <div className="fixed inset-0 z-[100] lg:hidden">
+                    <button
+                        type="button"
+                        aria-label="메뉴 닫기"
+                        className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                        onClick={closeMobileMenu}
+                    />
+
+                    <aside className="absolute right-0 top-0 flex h-full w-full max-w-[340px] flex-col bg-white shadow-2xl dark:bg-zinc-950">
+                        <div className="flex items-center justify-between border-b border-black/5 px-5 py-4 dark:border-white/10">
+                            <Link
+                                href="/"
+                                className="inline-flex items-center"
+                                onClick={closeMobileMenu}
+                            >
+                                <Image
+                                    src="/branding/mockio-text-logo.png"
+                                    alt="Mockio"
+                                    width={110}
+                                    height={22}
+                                    className="h-auto w-[110px]"
+                                />
+                            </Link>
+
+                            <button
+                                type="button"
+                                aria-label="메뉴 닫기"
+                                onClick={closeMobileMenu}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-(--border-soft) text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                            >
+                                <span className="text-lg leading-none">✕</span>
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto px-5 py-5">
+                            <nav className="space-y-2">
+                                <Link
+                                    href="/notice"
+                                    onClick={closeMobileMenu}
+                                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                >
+                                    공지사항
+                                </Link>
+
+                                <Link
+                                    href="/faq"
+                                    onClick={closeMobileMenu}
+                                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                >
+                                    FAQ
+                                </Link>
+
+                                {isInitialized && isLogin && (
+                                    <>
+                                        <div className="overflow-hidden rounded-2xl border border-black/5 dark:border-white/10">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setMobileInterviewOpen((prev) => !prev)
+                                                }
+                                                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                            >
+                                                <span>AI 면접</span>
+                                                <span
+                                                    className={`text-xs transition-transform ${
+                                                        mobileInterviewOpen
+                                                            ? "rotate-180"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    ▾
+                                                </span>
+                                            </button>
+
+                                            {mobileInterviewOpen && (
+                                                <div className="border-t border-black/5 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.02]">
+                                                    <Link
+                                                        href="/interview"
+                                                        onClick={closeMobileMenu}
+                                                        className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                                    >
+                                                        면접 시작
+                                                        <p className="mt-1 text-xs text-gray-500">
+                                                            새로운 AI 면접을 시작합니다
+                                                        </p>
+                                                    </Link>
+
+                                                    <div className="h-px bg-black/5 dark:bg-white/10" />
+
+                                                    <Link
+                                                        href="/interview/history"
+                                                        onClick={closeMobileMenu}
+                                                        className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                                    >
+                                                        면접 기록
+                                                        <p className="mt-1 text-xs text-gray-500">
+                                                            이전 면접 결과와 진행 내역을 확인합니다
+                                                        </p>
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="overflow-hidden rounded-2xl border border-black/5 dark:border-white/10">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setMobileMyInfoOpen((prev) => !prev)
+                                                }
+                                                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                            >
+                                                <span>내 정보</span>
+                                                <span
+                                                    className={`text-xs transition-transform ${
+                                                        mobileMyInfoOpen
+                                                            ? "rotate-180"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    ▾
+                                                </span>
+                                            </button>
+
+                                            {mobileMyInfoOpen && (
+                                                <div className="border-t border-black/5 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.02]">
+                                                    <Link
+                                                        href="/mypage"
+                                                        onClick={closeMobileMenu}
+                                                        className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                                    >
+                                                        내 정보
+                                                        <p className="mt-1 text-xs text-gray-500">
+                                                            면접 정보 및 내 정보를 수정합니다
+                                                        </p>
+                                                    </Link>
+
+                                                    <div className="h-px bg-black/5 dark:bg-white/10" />
+
+                                                    <Link
+                                                        href="/mypage/interview/history"
+                                                        onClick={closeMobileMenu}
+                                                        className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                                    >
+                                                        면접 기록
+                                                        <p className="mt-1 text-xs text-gray-500">
+                                                            면접 평가 내역을 확인합니다
+                                                        </p>
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </nav>
+                        </div>
+
+                        <div className="border-t border-black/5 px-5 py-4 dark:border-white/10">
+                            {isInitialized && isLogin ? (
+                                <div className="space-y-3">
+                                    <div className="flex justify-start">
+                                        <NotificationDropdown />
+                                    </div>
+
+                                    <Link
+                                        href="/interview"
+                                        onClick={closeMobileMenu}
+                                        className="inline-flex h-11 w-full items-center justify-center rounded-full bg-(--brand-primary) px-4 text-sm font-semibold text-white transition-colors hover:bg-(--brand-primary-hover)"
+                                    >
+                                        면접 시작
+                                    </Link>
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/preview"
+                                    onClick={closeMobileMenu}
+                                    className="inline-flex h-11 w-full items-center justify-center rounded-full border border-(--border-soft) px-4 text-sm font-medium text-(--brand-secondary) transition-colors hover:border-(--brand-secondary) hover:bg-(--surface-glass)"
+                                >
+                                    게스트 미리보기
+                                </Link>
+                            )}
+                        </div>
+                    </aside>
+                </div>
+            )}
+        </>
     );
 }

@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import {cookies} from "next/headers";
+import { useAuthStore } from "@/store/authStore";
 
 type PreviewQuestion = {
     phase: "워밍업" | "딥다이브" | "꼬리 질문" | "피드백";
@@ -41,37 +43,36 @@ const phases = [
     { key: "피드백", desc: "다음 액션으로 이어지는 요약을 제공합니다." },
 ] as const;
 
-export default async function PreviewPage() {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("MOCKIO_SESSION");
-    const isLogin = !!session?.value;
+export default function PreviewPage() {
+    const accessToken = useAuthStore((s) => s.accessToken);
+    const isInitialized = useAuthStore((s) => s.isInitialized);
+
+    if (!isInitialized) return null;
+
+    const isLogin = !!accessToken;
 
     return (
         <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,var(--tint-mint),transparent_60%),radial-gradient(900px_500px_at_90%_10%,var(--tint-sky),transparent_55%),linear-gradient(180deg,var(--tint-cream),var(--tint-ice))] text-[var(--text-primary)]">
             <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:py-14">
-                {/* Top bar */}
                 <header className="flex items-center justify-between gap-6">
                     <Link
-                        href="/apps/web/public"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-(--brand-secondary) hover:opacity-90"
+                        href="/"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-secondary)] hover:opacity-90"
                     >
                         <span className="text-base">←</span>
                         홈으로
                     </Link>
-
-
                 </header>
 
-                {/* Hero */}
                 <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
                     <div className="flex flex-col gap-4">
-                        <p className="text-sm uppercase tracking-[0.2em] text-(--brand-muted)">Preview</p>
+                        <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">Preview</p>
                         <h1 className="text-4xl font-semibold leading-[1.15] text-foreground sm:text-5xl">
                             실제 면접에 가까운 흐름을
                             <br />
                             미리 경험해보세요
                         </h1>
-                        <p className="max-w-xl text-lg leading-8 text-(--brand-copy)">
+                        <p className="max-w-xl text-lg leading-8 text-[var(--brand-copy)]">
                             Mockio는 질문을 “나열”하지 않고, 답변을 “정리”하도록 돕습니다. 아래 예시는 한 세션의
                             흐름을 그대로 축약한 미리보기입니다.
                         </p>
@@ -79,61 +80,63 @@ export default async function PreviewPage() {
                         <div className="flex flex-wrap items-center gap-4 pt-2">
                             <Link
                                 href="/preview"
-                                className="inline-flex h-12 items-center justify-center rounded-full bg-(--brand-primary) px-6 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(53,90,122,0.25)] transition-colors hover:bg-[var(--brand-primary-hover)]"
+                                className="inline-flex h-12 items-center justify-center rounded-full bg-[var(--brand-primary)] px-6 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(53,90,122,0.25)] transition-colors hover:bg-[var(--brand-primary-hover)]"
                             >
                                 질문 예시 보기
                             </Link>
                             <Link
                                 href="/"
-                                className="inline-flex h-12 items-center justify-center rounded-full border border-(--border-soft) px-6 text-sm font-semibold text-(--brand-secondary) transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
+                                className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-soft)] px-6 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:border-[var(--brand-secondary)] hover:bg-[var(--surface-glass)]"
                             >
                                 메인으로 돌아가기
                             </Link>
                         </div>
 
-                        <p className="pt-2 text-sm text-(--brand-muted)">
+                        <p className="pt-2 text-sm text-[var(--brand-muted)]">
                             * 게스트 미리보기는 가능하지만, 기록/저장은 로그인 후 이용할 수 있습니다.
                         </p>
                     </div>
 
-                    {/* Flow card */}
-                    <div className="rounded-3xl border border-(--border-glass) bg-(--surface-glass-strong) p-6 shadow-[0_24px_48px_rgba(20,30,50,0.12)]">
-                        <p className="text-sm uppercase tracking-[0.2em] text-(--brand-muted)">Flow</p>
+                    <div className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass-strong)] p-6 shadow-[0_24px_48px_rgba(20,30,50,0.12)]">
+                        <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">Flow</p>
                         <h2 className="mt-3 text-xl font-semibold text-foreground">한 세션은 이렇게 흘러갑니다</h2>
 
                         <div className="mt-4 grid gap-3">
                             {phases.map((p, idx) => (
                                 <div
                                     key={p.key}
-                                    className="flex items-start gap-3 rounded-2xl border border-(--surface-soft-border) bg-(--surface-glass) p-4"
+                                    className="flex items-start gap-3 rounded-2xl border border-[var(--surface-soft-border)] bg-[var(--surface-glass)] p-4"
                                 >
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/60 text-xs font-bold text-(--brand-secondary)">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/60 text-xs font-bold text-[var(--brand-secondary)]">
                                         {idx + 1}
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-sm font-semibold text-foreground">{p.key}</p>
-                                        <p className="mt-1 text-sm text-(--brand-copy)">{p.desc}</p>
+                                        <p className="mt-1 text-sm text-[var(--brand-copy)]">{p.desc}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div id="start" className="mt-6 rounded-2xl border border-(--surface-soft-border) bg-(--surface-soft) p-4">
-                            <p className="text-sm text-(--brand-copy)">
+                        <div
+                            id="start"
+                            className="mt-6 rounded-2xl border border-[var(--surface-soft-border)] bg-[var(--surface-soft)] p-4"
+                        >
+                            <p className="text-sm text-[var(--brand-copy)]">
                                 지금은 예시만 제공됩니다. 실제 세션에서는 답변 기록과 간단한 피드백을 함께 제공합니다.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {isLogin ? (
                                     <Link
                                         href="/interview"
-                                        className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-primary) px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
+                                        className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
                                     >
                                         면접 시작하기
                                     </Link>
                                 ) : (
                                     <Link
-                                        href="http://localhost:9000/api/auth/v1/public/login"
-                                        className="inline-flex h-11 items-center justify-center rounded-full bg-(--brand-secondary) px-5 text-sm font-semibold text-white transition hover:opacity-90"
+                                        href="/login"
+                                        className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand-secondary)] px-5 text-sm font-semibold text-white transition hover:opacity-90"
                                     >
                                         로그인
                                     </Link>
@@ -143,15 +146,14 @@ export default async function PreviewPage() {
                     </div>
                 </section>
 
-                {/* Samples */}
                 <section
                     id="samples"
-                    className="rounded-3xl border border-(--border-glass) bg-(--surface-glass) p-8 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
+                    className="rounded-3xl border border-[var(--border-glass)] bg-[var(--surface-glass)] p-8 shadow-[0_18px_40px_rgba(20,30,50,0.12)]"
                 >
                     <div className="flex flex-col gap-2">
-                        <p className="text-sm uppercase tracking-[0.2em] text-(--brand-muted)">Samples</p>
+                        <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-muted)]">Samples</p>
                         <h2 className="text-2xl font-semibold text-foreground">질문 예시</h2>
-                        <p className="text-sm text-(--brand-copy)">
+                        <p className="text-sm text-[var(--brand-copy)]">
                             각 질문마다 “의도”를 함께 제공합니다. 실제 세션에서는 답변에 맞춰 꼬리 질문이 이어집니다.
                         </p>
                     </div>
@@ -160,25 +162,23 @@ export default async function PreviewPage() {
                         {previewQuestions.map((q) => (
                             <article
                                 key={`${q.phase}-${q.title}`}
-                                className="rounded-2xl border border-(--surface-soft-border) bg-(--surface-glass-strong) p-6"
+                                className="rounded-2xl border border-[var(--surface-soft-border)] bg-[var(--surface-glass-strong)] p-6"
                             >
                                 <div className="flex items-center justify-between gap-4">
-                  <span className="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-(--brand-secondary)">
+                  <span className="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-[var(--brand-secondary)]">
                     {q.phase}
                   </span>
-                                    <span className="text-xs text-(--brand-muted)">예시</span>
+                                    <span className="text-xs text-[var(--brand-muted)]">예시</span>
                                 </div>
 
-                                <h3 className="mt-4 text-base font-semibold text-foreground">
-                                    Q. {q.title}
-                                </h3>
+                                <h3 className="mt-4 text-base font-semibold text-foreground">Q. {q.title}</h3>
 
-                                <p className="mt-3 text-sm leading-6 text-(--brand-copy)">
+                                <p className="mt-3 text-sm leading-6 text-[var(--brand-copy)]">
                                     <span className="font-semibold text-foreground">의도</span> — {q.intent}
                                 </p>
 
                                 {q.tips?.length ? (
-                                    <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-(--brand-muted)">
+                                    <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-[var(--brand-muted)]">
                                         {q.tips.map((t) => (
                                             <li key={t}>{t}</li>
                                         ))}
@@ -187,13 +187,9 @@ export default async function PreviewPage() {
                             </article>
                         ))}
                     </div>
-
-                    {/* Cutoff / tease */}
-
                 </section>
 
-                {/* Footer note */}
-                <footer className="pb-4 text-center text-xs text-(--brand-muted)">
+                <footer className="pb-4 text-center text-xs text-[var(--brand-muted)]">
                     Mockio Preview
                 </footer>
             </main>

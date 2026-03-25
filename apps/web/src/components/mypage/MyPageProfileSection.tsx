@@ -84,6 +84,7 @@ export default function MyPageProfileSection({
                         닉네임
                     </label>
                     <input
+                        maxLength={30}
                         type="text"
                         value={profile.nickname}
                         onChange={(e) => onProfileChange("nickname", e.target.value)}
