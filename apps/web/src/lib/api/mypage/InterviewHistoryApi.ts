@@ -20,7 +20,7 @@ export const InterviewHistoryApi = async (
         `${endpoints.interview}/history/score-list`,
         {
             params,
-        }
+        } 
     );
 
     return response.data.data ?? null;
