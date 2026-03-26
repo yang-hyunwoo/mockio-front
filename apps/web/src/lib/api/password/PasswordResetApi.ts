@@ -1,11 +1,13 @@
 import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import { getClientApiEndpoints} from "@/lib/api"
+
+const endpoints = getClientApiEndpoints();
 
 export const PasswordResetApi = async (
     request: { email: string }
 ): Promise<void> => {
-    await api.post(
-        `${apiEndpoints.userPublic}/password-find`,
+       await api.post(
+        `${endpoints.userPublic}/password-find`,
         request
     )
 }

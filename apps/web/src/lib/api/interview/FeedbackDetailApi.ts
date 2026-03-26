@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import { getClientApiEndpoints} from "@/lib/api"
 import {FeedbackResponse} from "@mockio/shared/src/api/interview/FeedbackDetail";
 import {AxiosRequestConfig} from "axios";
 
@@ -11,10 +11,13 @@ type LoadingAxiosRequestConfig = AxiosRequestConfig & {
     }
 }
 
+
 export async function FeedbackDetailApi(questionId: number): Promise<FeedbackResponse | null> {
+    const endpoints = getClientApiEndpoints();
+
     try {
         const response = await api.get(
-            `${apiEndpoints.interview}/${questionId}/feedback`,
+            `${endpoints.interview}/${questionId}/feedback`,
             {
                 meta: {
                     loading: "none",

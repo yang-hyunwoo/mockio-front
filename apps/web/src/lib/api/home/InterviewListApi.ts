@@ -1,11 +1,12 @@
-import { api } from "@/lib/axios";
-import { apiEndpoints } from "@/lib/api";
-import { Interview } from "@mockio/shared/src/api/home/Interview";
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+import {Interview} from "@mockio/shared/src/api/home/Interview";
 
 export const interviewListApi = async (): Promise<Interview[]> => {
+    const endpoints = getClientApiEndpoints();
     try {
         const res = await api.get(
-            `${apiEndpoints.interview}/main/list`
+            `${endpoints.interview}/main/list`
         );
 
         const list =

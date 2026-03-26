@@ -1,13 +1,14 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import {api} from "@/lib/axios";
 import {PasswordChangeRequest} from "@mockio/shared/src/api/password/PasswordChangeRequest";
-
+import {getClientApiEndpoints} from "@mockio/shared/src/api";
 
 export const PasswordResetConfirmApi = async (
     payload: PasswordChangeRequest
 ): Promise<void> => {
+    const endpoints = getClientApiEndpoints();
+
     await api.post(
-        `${apiEndpoints.userPublic}/password/change`,
+        `${endpoints.userPublic}/password/change`,
         payload
     )
 }

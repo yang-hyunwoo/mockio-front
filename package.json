@@ -1,0 +1,9 @@
+{
+  "name": "mockio-front",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+
+}

@@ -5,7 +5,7 @@ import axios, {
     AxiosRequestConfig,
     InternalAxiosRequestConfig,
 } from "axios";
-import { apiBaseUrl, apiEndpoints } from "@mockio/shared/src/api";
+import { getClientApiBaseUrl, getClientApiEndpoints } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 const AUTH_PATH_REGEXES = [
@@ -41,17 +41,16 @@ function emitLoadingEnd(type: Exclude<LoadingType, "none">) {
     );
 }
 
-
-
 function getLoadingType(
     config?: AxiosRequestConfig | InternalAxiosRequestConfig
 ): LoadingType {
-    const loadingConfig = config as (AxiosRequestConfig & LoadingMetaConfig) | undefined;
+    const loadingConfig =
+        config as (AxiosRequestConfig & LoadingMetaConfig) | undefined;
     return loadingConfig?.meta?.loading ?? "top";
 }
 
 export const api = axios.create({
-    baseURL: apiBaseUrl,
+    baseURL: getClientApiBaseUrl(),
     withCredentials: true,
 });
 
@@ -107,16 +106,17 @@ api.interceptors.response.use(
         const status = error.response.status;
 
         if (
-            status === 401
-            &&
+            status === 401 &&
             !originalRequest._retry &&
             !isAuthPath(originalRequest.url)
         ) {
             originalRequest._retry = true;
 
             try {
+                const endpoints = getClientApiEndpoints();
+
                 const refreshResponse = await axios.get(
-                    `${apiEndpoints.authPublic}/refresh`,
+                    `${endpoints.authPublic}/refresh`,
                     { withCredentials: true }
                 );
 
@@ -136,7 +136,6 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 useAuthStore.getState().clearAuth();
-                // moveToLogin();
                 return Promise.reject(refreshError);
             }
         }

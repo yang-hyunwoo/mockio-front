@@ -288,7 +288,7 @@ export default function HomeHeader() {
                                                         onClick={closeMobileMenu}
                                                         className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
                                                     >
-                                                        면접 기록
+                                                        면접 내역
                                                         <p className="mt-1 text-xs text-gray-500">
                                                             이전 면접 결과와 진행 내역을 확인합니다
                                                         </p>
@@ -342,6 +342,16 @@ export default function HomeHeader() {
                                                             면접 평가 내역을 확인합니다
                                                         </p>
                                                     </Link>
+                                                    <Link
+                                                        href="/mypage/authorize"
+                                                        onClick={closeMobileMenu}
+                                                        className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                                    >
+                                                        보안
+                                                        <p className="mt-1 block text-xs text-gray-500">
+                                                            비밀번호 변경 및 회원 탈퇴를 합니다.
+                                                        </p>
+                                                    </Link>
                                                 </div>
                                             )}
                                         </div>
@@ -366,13 +376,7 @@ export default function HomeHeader() {
                                     </Link>
                                 </div>
                             ) : (
-                                <Link
-                                    href="/preview"
-                                    onClick={closeMobileMenu}
-                                    className="inline-flex h-11 w-full items-center justify-center rounded-full border border-(--border-soft) px-4 text-sm font-medium text-(--brand-secondary) transition-colors hover:border-(--brand-secondary) hover:bg-(--surface-glass)"
-                                >
-                                    게스트 미리보기
-                                </Link>
+                                <></>
                             )}
                         </div>
                     </aside>

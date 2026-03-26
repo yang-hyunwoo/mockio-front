@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/axios";
-import { apiEndpoints } from "@mockio/shared/src";
+import {getClientApiEndpoints} from "@mockio/shared/src/api";
 
 const EXCLUDED_PATHS = ["/login", "/social/callback", "/signup","/password/reset","/password"];
+const endpoints = getClientApiEndpoints();
 
 export default function AuthInitializer({
                                             children,
@@ -34,7 +35,7 @@ export default function AuthInitializer({
         const initAuth = async () => {
             try {
                 const refreshRes = await api.get(
-                    `${apiEndpoints.authPublic}/refresh`,
+                    `${endpoints.authPublic}/refresh`,
                     {
                         withCredentials: true,
                         skipAuthRefresh: true,
@@ -53,7 +54,7 @@ export default function AuthInitializer({
 
                 setAccessToken(newAccessToken);
 
-                const meRes = await api.get(`${apiEndpoints.auth}/me`, {
+                const meRes = await api.get(`${endpoints.auth}/me`, {
                     withCredentials: true,
                     skipAuthRefresh: true,
                 });

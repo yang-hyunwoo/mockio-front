@@ -1,11 +1,13 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
 
 export const PasswordResetValidateApi = async (
     request: { token: string }
 ): Promise<void> => {
+    const endpoints = getClientApiEndpoints();
+
     await api.get(
-        `${apiEndpoints.userPublic}/password/reset/validate`,
+        `${endpoints.userPublic}/password/reset/validate`,
         {
             params: request,
         }

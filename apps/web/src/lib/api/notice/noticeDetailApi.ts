@@ -1,12 +1,14 @@
-import { apiEndpoints } from "@/lib/api";
+import {getServerApiEndpoints} from "@/lib/api";
 import {NoticeDetail} from "@mockio/shared/src/api/notice/NoticeDetail";
 
 export const noticeDetailApi = async (
     id: string
 ): Promise<NoticeDetail | null> => {
+    const endpoints = getServerApiEndpoints();
+
     try {
         const res = await fetch(
-            `${apiEndpoints.notiPublic}/notice/detail/${id}`,
+            `${endpoints.notiPublic}/notice/detail/${id}`,
             { cache: "no-store" }
         )
 

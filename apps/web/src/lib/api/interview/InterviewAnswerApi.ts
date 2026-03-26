@@ -1,6 +1,6 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
-import { AxiosRequestConfig } from "axios"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+import {AxiosRequestConfig} from "axios";
 import {InterviewAnswerRequest} from "@mockio/shared/src/api/request/interview/InterviewAnswerRequest";
 import {InterviewQuestionReadResponse} from "@/lib/api/interview/InterviewQuestionApi";
 
@@ -17,12 +17,15 @@ type ApiResponse<T> = {
     data: T
 }
 
+
 export const InterviewAnswerApi = async (
     payload: InterviewAnswerRequest
 ): Promise<InterviewQuestionReadResponse | null> => {
+    const endpoints = getClientApiEndpoints();
+
     try {
         const response = await api.post<ApiResponse<InterviewQuestionReadResponse>>(
-            `${apiEndpoints.interview}/interviews/answer`,
+            `${endpoints.interview}/interviews/answer`,
             payload,
             {
                 meta: {

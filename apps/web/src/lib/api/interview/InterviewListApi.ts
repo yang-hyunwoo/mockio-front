@@ -1,14 +1,17 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
-import { InterviewItem } from "@mockio/shared/src/api/interview/InterviewPage"
-import { PageResponse } from "@mockio/shared/src/api/PageResponse"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+import {InterviewItem} from "@mockio/shared/src/api/interview/InterviewPage";
+import {PageResponse} from "@mockio/shared/src/api/PageResponse";
+
 
 export const InterviewListApi = async (
     page: number,
     size: number
 ): Promise<PageResponse<InterviewItem> | null> => {
+    const endpoints = getClientApiEndpoints();
+
     const res = await api.get<{ data: PageResponse<InterviewItem> }>(
-        `${apiEndpoints.interview}/list`,
+        `${endpoints.interview}/list`,
         { params: { page, size } }
     )
 

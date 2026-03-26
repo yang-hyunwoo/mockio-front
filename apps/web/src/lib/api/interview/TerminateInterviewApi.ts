@@ -1,9 +1,12 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+
 
 export async function TerminateInterviewApi(): Promise<boolean> {
+    const endpoints = getClientApiEndpoints();
+
     try {
-        await api.patch(`${apiEndpoints.interview}/exit`)
+        await api.patch(`${endpoints.interview}/exit`)
         return true
     } catch (error) {
         console.error(error)

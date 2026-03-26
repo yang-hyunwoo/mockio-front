@@ -1,6 +1,6 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
-import { NotificationResponse } from "@mockio/shared/src/api/home/NotificationResponse"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+import {NotificationResponse} from "@mockio/shared/src/api/home/NotificationResponse";
 
 
 export type NotificationReadResponseType = {
@@ -12,9 +12,11 @@ export type NotificationReadResponseType = {
 
 export const NotificationApi = async (
 ): Promise<NotificationReadResponseType | null> => {
+    const endpoints = getClientApiEndpoints();
+
     try {
         const response = await api.get(
-            `${apiEndpoints.notification}/main/list`
+            `${endpoints.notification}/main/list`
         )
 
         return response.data.data ?? null

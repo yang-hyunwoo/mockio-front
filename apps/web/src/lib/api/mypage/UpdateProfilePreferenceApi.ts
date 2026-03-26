@@ -1,12 +1,13 @@
-import { api } from "@/lib/axios"
-import {apiEndpoints} from "@mockio/shared/src";
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@mockio/shared/src/api";
 
 export const UpdateProfilePreferenceApi = async (
     preference: FormData
 ): Promise<boolean> => {
+    const endpoints = getClientApiEndpoints();
 
     await api.patch(
-        `${apiEndpoints.user}/mypage/profile`,
+        `${endpoints.user}/mypage/profile`,
         preference
     );
 

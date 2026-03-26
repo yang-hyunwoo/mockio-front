@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { apiEndpoints } from "@mockio/shared/src/api";
 import { useAuthStore } from "@/store/authStore";
+import {getClientApiEndpoints} from "@mockio/shared/src/api";
+
+const endpoints = getClientApiEndpoints();
 
 export default function SocialCallbackPage() {
     const router = useRouter();
@@ -16,7 +18,7 @@ export default function SocialCallbackPage() {
     useEffect(() => {
         const handleSocialLogin = async () => {
             try {
-                const response = await axios.get(`${apiEndpoints.authPublic}/refresh`, {
+                const response = await axios.get(`${endpoints.authPublic}/refresh`, {
                     withCredentials: true,
                 });
 

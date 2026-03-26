@@ -1,11 +1,14 @@
-import { api } from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api"
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+
 
 export const DeleteAccountApi = async (
     request: { password: string }
 ): Promise<boolean> => {
+    const endpoints = getClientApiEndpoints();
+
     try {
-        await api.patch(`${apiEndpoints.user}/delete`,
+        await api.patch(`${endpoints.user}/delete`,
             request)
         return true
     } catch (error) {

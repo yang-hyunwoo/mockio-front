@@ -1,6 +1,9 @@
-import { api } from "@/lib/axios";
-import { apiEndpoints } from "@/lib/api";
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+
 
 export const logoutApi = async () => {
-    await api.post(`${apiEndpoints.auth}/logout`);
+    const endpoints = getClientApiEndpoints();
+
+    await api.post(`${endpoints.auth}/logout`);
 };

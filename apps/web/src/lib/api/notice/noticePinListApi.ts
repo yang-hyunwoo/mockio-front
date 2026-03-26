@@ -1,10 +1,12 @@
-import { api } from "@/lib/axios";
-import { apiEndpoints } from "@/lib/api";
-import { Notice } from "@mockio/shared/src/api/notice/Notice";
+import {api} from "@/lib/axios";
+import {getClientApiEndpoints} from "@/lib/api";
+import {Notice} from "@mockio/shared/src/api/notice/Notice";
 
 export const noticePinListApi = async (): Promise<Notice[]> => {
+    const endpoints = getClientApiEndpoints();
+
     try {
-        const res = await api.get(`${apiEndpoints.notiPublic}/notice/pinned/list`)
+        const res = await api.get(`${endpoints.notiPublic}/notice/pinned/list`)
         const list = res.data?.data ?? []
         return list.map((item: any) => ({
             id: item.id,

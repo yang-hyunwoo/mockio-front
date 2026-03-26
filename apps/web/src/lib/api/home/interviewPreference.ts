@@ -1,11 +1,13 @@
-import { api } from "@/lib/axios";
-import { Preference } from "@mockio/shared/src/api/home/Preference";
-import { apiEndpoints } from "@/lib/api";
+import {api} from "@/lib/axios";
+import {Preference} from "@mockio/shared/src/api/home/Preference";
+import {getClientApiEndpoints} from "@/lib/api";
 
 export const interviewPreferenceApi = async (): Promise<Preference | null> => {
+    const endpoints = getClientApiEndpoints();
+
     try {
         const res = await api.get(
-            `${apiEndpoints.interview}/me/get-preference`,
+            `${endpoints.interview}/me/get-preference`,
         );
         const data = res.data?.data;
 
