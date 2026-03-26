@@ -1,5 +1,6 @@
 export interface  SignupRequest  {
     email : string,
     password : string,
-    nickname : string
+    nickname : string,
+    recaptchaToken: string
 }
