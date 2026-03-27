@@ -1,0 +1,10 @@
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="140" rx="32" fill="#EEF4FF"/>
+  <rect x="30" y="34" width="80" height="52" rx="16" fill="#2563EB"/>
+  <path d="M48 60C48 53.3726 53.3726 48 60 48H80C86.6274 48 92 53.3726 92 60C92 66.6274 86.6274 72 80 72H67.5L58 81.5V72H60C53.3726 72 48 66.6274 48 60Z" fill="white"/>
+  <circle cx="62" cy="60" r="3.5" fill="#2563EB"/>
+  <circle cx="70" cy="60" r="3.5" fill="#2563EB"/>
+  <circle cx="78" cy="60" r="3.5" fill="#2563EB"/>
+  <path d="M42 98.5H98" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" opacity="0.18"/>
+  <text x="70" y="112" text-anchor="middle" font-family="Inter, Pretendard, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700" fill="#0F172A" letter-spacing="0.5">mockio</text>
+</svg>
