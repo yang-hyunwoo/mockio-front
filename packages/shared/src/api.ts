@@ -26,7 +26,7 @@ const createEndpoints = (baseUrl: string) => ({
   notiPublic: `${baseUrl}/notice/${version}/public`,
   faqPublic: `${baseUrl}/faq/${version}/public`,
   authPublic: `${baseUrl}/auth/${version}/public`,
-});  
+});      
 
 export const getClientApiBaseUrl = () =>
     normalizeBaseUrl(process.env.NEXT_PUBLIC_API_URL);
