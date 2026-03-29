@@ -31,6 +31,13 @@
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --border-color: #334155;
+  --tint-mint: rgba(16, 185, 129, 0.10);
+  --tint-sky: rgba(59, 130, 246, 0.10);
+  --tint-cream: #0b1220;
+  --tint-ice: #111827;
+  --surface-glass: rgba(24, 24, 27, 0.82);
+  --surface-glass-strong: rgba(24, 24, 27, 0.92);
+  --surface-soft: #1f2937;
 }
 body {
   background: var(--bg-primary);
@@ -40,4 +47,16 @@ body {
 
 .notice-viewer {
   white-space: pre-wrap;
+}
+
+.signup-recaptcha {
+  width: 304px;
+  max-width: 100%;
+}
+
+@media (max-width: 380px) {
+  .signup-recaptcha {
+    transform: scale(0.92);
+    transform-origin: center top;
+  }
 }

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import Script from "next/script"
+import { useTheme } from "next-themes"
 import { SignupApi } from "@/lib/api/login/SignupApi"
 
 declare global {
@@ -26,6 +27,10 @@ declare global {
 }
 
 export default function SignupPage() {
+    const { resolvedTheme } = useTheme()
+
+    const [mounted, setMounted] = useState(false)
+
     const [email, setEmail] = useState("")
     const [nickname, setNickname] = useState("")
     const [password, setPassword] = useState("")
@@ -72,17 +77,25 @@ export default function SignupPage() {
         passwordConfirm.length > 0 && password !== passwordConfirm
 
     useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    useEffect(() => {
+        if (!mounted) return
         if (!scriptLoaded) return
         if (!recaptchaRef.current) return
-        if (widgetIdRef.current !== null) return
         if (!window.grecaptcha) return
+
+        recaptchaRef.current.innerHTML = ""
+        widgetIdRef.current = null
+        setRecaptchaToken("")
 
         window.grecaptcha.ready(() => {
             if (!recaptchaRef.current || !window.grecaptcha) return
 
             widgetIdRef.current = window.grecaptcha.render(recaptchaRef.current, {
                 sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "",
-                theme: "light",
+                theme: resolvedTheme === "dark" ? "dark" : "light",
                 callback: (token: string) => {
                     setRecaptchaToken(token)
                     setRecaptchaError("")
@@ -98,7 +111,7 @@ export default function SignupPage() {
                 },
             })
         })
-    }, [scriptLoaded])
+    }, [mounted, scriptLoaded, resolvedTheme])
 
     const resetRecaptcha = () => {
         if (widgetIdRef.current !== null && window.grecaptcha) {
@@ -132,7 +145,6 @@ export default function SignupPage() {
         setEmailSuccess("")
         const formatError = validateEmailFormat(email)
         setEmailError(formatError)
-
         if (formatError) return
     }
 
@@ -140,7 +152,6 @@ export default function SignupPage() {
         setNicknameSuccess("")
         const validationError = validateNickname(nickname)
         setNicknameError(validationError)
-
         if (validationError) return
     }
 
@@ -190,15 +201,13 @@ export default function SignupPage() {
             return
         }
 
-        const payload = {
-            email,
-            nickname,
-            password,
-            recaptchaToken,
-        }
-
         try {
-            await SignupApi(payload)
+            await SignupApi({
+                email,
+                nickname,
+                password,
+                recaptchaToken,
+            })
             alert("회원가입이 완료되었습니다.")
             window.location.href = "/login/signup/success"
         } catch (error: any) {
@@ -235,7 +244,7 @@ export default function SignupPage() {
                 onLoad={() => setScriptLoaded(true)}
             />
 
-            <div className="flex min-h-screen items-center justify-center bg-[#f3f4f6] px-4 py-10">
+            <div className="flex min-h-screen items-center justify-center bg-[var(--bg-page)] px-4 py-10">
                 <div className="w-full max-w-[460px]">
                     <div className="mb-10 flex flex-col items-center">
                         <div className="relative mb-2 h-[180px] w-[180px]">
@@ -249,19 +258,19 @@ export default function SignupPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-[#d9d9d9] bg-white px-6 py-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
+                    <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] px-6 py-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
                         <div className="mb-6">
-                            <h1 className="text-[26px] font-bold tracking-[-0.02em] text-[#1f2937]">
+                            <h1 className="text-[26px] font-bold tracking-[-0.02em] text-[var(--text-primary)]">
                                 회원가입
                             </h1>
-                            <p className="mt-1 text-sm text-[#6b7280]">
+                            <p className="mt-1 text-sm text-[var(--text-secondary)]">
                                 이메일과 닉네임을 입력하고 계정을 생성하세요.
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-[#374151]">
+                                <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
                                     이메일
                                 </label>
                                 <input
@@ -275,12 +284,12 @@ export default function SignupPage() {
                                         setSubmitError("")
                                     }}
                                     onBlur={handleEmailBlur}
-                                    className={`h-12 w-full rounded-xl bg-white px-4 text-[15px] text-[#111827] outline-none transition focus:ring-2 ${
+                                    className={`h-12 w-full rounded-xl bg-[var(--bg-input)] px-4 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none transition focus:ring-2 ${
                                         emailError
-                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200"
+                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200/60"
                                             : emailSuccess
-                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200"
-                                                : "border border-[#d9d9d9] focus:border-[#3f7a97] focus:ring-[#3f7a97]/20"
+                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200/60"
+                                                : "border border-[var(--border-color)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/20"
                                     }`}
                                 />
                                 <p className="mt-2 text-xs font-medium text-red-500">
@@ -289,7 +298,7 @@ export default function SignupPage() {
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-[#374151]">
+                                <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
                                     닉네임
                                 </label>
                                 <input
@@ -303,12 +312,12 @@ export default function SignupPage() {
                                         setSubmitError("")
                                     }}
                                     onBlur={handleNicknameBlur}
-                                    className={`h-12 w-full rounded-xl bg-white px-4 text-[15px] text-[#111827] outline-none transition focus:ring-2 ${
+                                    className={`h-12 w-full rounded-xl bg-[var(--bg-input)] px-4 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none transition focus:ring-2 ${
                                         nicknameError
-                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200"
+                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200/60"
                                             : nicknameSuccess
-                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200"
-                                                : "border border-[#d9d9d9] focus:border-[#3f7a97] focus:ring-[#3f7a97]/20"
+                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200/60"
+                                                : "border border-[var(--border-color)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/20"
                                     }`}
                                 />
                                 <p className="mt-2 text-xs font-medium text-red-500">
@@ -317,7 +326,7 @@ export default function SignupPage() {
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-[#374151]">
+                                <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
                                     비밀번호
                                 </label>
                                 <input
@@ -336,12 +345,12 @@ export default function SignupPage() {
                                             setPasswordConfirmError("")
                                         }
                                     }}
-                                    className={`h-12 w-full rounded-xl bg-white px-4 text-[15px] text-[#111827] outline-none transition focus:ring-2 ${
+                                    className={`h-12 w-full rounded-xl bg-[var(--bg-input)] px-4 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none transition focus:ring-2 ${
                                         passwordError
-                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200"
+                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200/60"
                                             : isPasswordValid && password.length > 0
-                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200"
-                                                : "border border-[#d9d9d9] focus:border-[#3f7a97] focus:ring-[#3f7a97]/20"
+                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200/60"
+                                                : "border border-[var(--border-color)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/20"
                                     }`}
                                 />
 
@@ -351,22 +360,22 @@ export default function SignupPage() {
                                     </p>
                                 )}
 
-                                <div className="mt-3 rounded-xl bg-[#f9fafb] px-4 py-3">
-                                    <p className="mb-2 text-xs font-semibold text-[#4b5563]">
+                                <div className="mt-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-4 py-3">
+                                    <p className="mb-2 text-xs font-semibold text-[var(--text-primary)]">
                                         비밀번호 조건
                                     </p>
 
                                     <div className="space-y-1 text-xs">
-                                        <p className={passwordChecks.length ? "text-emerald-600" : "text-[#6b7280]"}>
+                                        <p className={passwordChecks.length ? "text-emerald-500" : "text-[var(--text-secondary)]"}>
                                             {passwordChecks.length ? "✓" : "•"} 8자 이상
                                         </p>
-                                        <p className={passwordChecks.english ? "text-emerald-600" : "text-[#6b7280]"}>
+                                        <p className={passwordChecks.english ? "text-emerald-500" : "text-[var(--text-secondary)]"}>
                                             {passwordChecks.english ? "✓" : "•"} 영문 포함
                                         </p>
-                                        <p className={passwordChecks.number ? "text-emerald-600" : "text-[#6b7280]"}>
+                                        <p className={passwordChecks.number ? "text-emerald-500" : "text-[var(--text-secondary)]"}>
                                             {passwordChecks.number ? "✓" : "•"} 숫자 포함
                                         </p>
-                                        <p className={passwordChecks.special ? "text-emerald-600" : "text-[#6b7280]"}>
+                                        <p className={passwordChecks.special ? "text-emerald-500" : "text-[var(--text-secondary)]"}>
                                             {passwordChecks.special ? "✓" : "•"} 특수문자 포함
                                         </p>
                                     </div>
@@ -374,7 +383,7 @@ export default function SignupPage() {
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-[#374151]">
+                                <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
                                     비밀번호 확인
                                 </label>
                                 <input
@@ -392,12 +401,12 @@ export default function SignupPage() {
                                             setPasswordConfirmError("")
                                         }
                                     }}
-                                    className={`h-12 w-full rounded-xl bg-white px-4 text-[15px] text-[#111827] outline-none transition focus:ring-2 ${
+                                    className={`h-12 w-full rounded-xl bg-[var(--bg-input)] px-4 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none transition focus:ring-2 ${
                                         passwordConfirmError
-                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200"
+                                            ? "border border-red-400 focus:border-red-400 focus:ring-red-200/60"
                                             : passwordConfirm.length > 0 && password === passwordConfirm
-                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200"
-                                                : "border border-[#d9d9d9] focus:border-[#3f7a97] focus:ring-[#3f7a97]/20"
+                                                ? "border border-emerald-400 focus:border-emerald-400 focus:ring-emerald-200/60"
+                                                : "border border-[var(--border-color)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/20"
                                     }`}
                                 />
 
@@ -410,18 +419,20 @@ export default function SignupPage() {
                                 {!passwordConfirmError &&
                                     passwordConfirm.length > 0 &&
                                     password === passwordConfirm && (
-                                        <p className="mt-2 text-xs font-medium text-emerald-600">
+                                        <p className="mt-2 text-xs font-medium text-emerald-500">
                                             비밀번호가 일치합니다.
                                         </p>
                                     )}
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-[#374151]">
+                                <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
                                     자동 가입 방지
                                 </label>
-                                <div className="rounded-xl border border-[#d9d9d9] bg-[#f9fafb] px-4 py-4">
-                                    <div ref={recaptchaRef} />
+                                <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-2 py-4 sm:px-4">
+                                    <div className="flex justify-center overflow-hidden">
+                                        <div className="signup-recaptcha" ref={recaptchaRef} />
+                                    </div>
                                 </div>
                                 {recaptchaError && (
                                     <p className="mt-2 text-xs font-medium text-red-500">
@@ -430,7 +441,7 @@ export default function SignupPage() {
                                 )}
                             </div>
 
-                            <label className="flex items-start gap-3 rounded-xl bg-[#f9fafb] px-4 py-3 text-sm text-[#374151]">
+                            <label className="flex items-start gap-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-4 py-3 text-sm text-[var(--text-secondary)]">
                                 <input
                                     type="checkbox"
                                     checked={agreeTerms}
@@ -438,10 +449,10 @@ export default function SignupPage() {
                                         setAgreeTerms(e.target.checked)
                                         setSubmitError("")
                                     }}
-                                    className="mt-0.5 h-4 w-4 accent-[#3f7a97]"
+                                    className="mt-0.5 h-4 w-4 accent-[var(--brand-primary)]"
                                 />
                                 <span>
-                                    <span className="font-medium">
+                                    <span className="font-medium text-[var(--text-primary)]">
                                         이용약관 및 개인정보 처리방침
                                     </span>
                                     에 동의합니다.
@@ -454,18 +465,18 @@ export default function SignupPage() {
 
                             <button
                                 type="submit"
-                                className="mt-2 h-[54px] w-full rounded-xl bg-[#3f7a97] text-[17px] font-semibold text-white transition hover:bg-[#356a84] active:scale-[0.98]"
+                                className="mt-2 h-[54px] w-full rounded-xl bg-[var(--brand-primary)] text-[17px] font-semibold text-white transition hover:bg-[var(--brand-primary-hover)] active:scale-[0.98]"
                             >
                                 회원가입
                             </button>
                         </form>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[#8c8c9a]">
+                    <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[var(--text-secondary)]">
                         <span>이미 계정이 있으신가요?</span>
                         <Link
                             href="/login"
-                            className="font-semibold text-[#3f7a97] hover:text-[#356a84]"
+                            className="font-semibold text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
                         >
                             로그인
                         </Link>
