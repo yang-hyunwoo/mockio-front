@@ -4,7 +4,7 @@ export default function HeroSection() {
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-4">
-                <h1 className="text-4xl sm:text-5xl font-semibold leading-[1.15] text-[var(--text-primary)]">
+                <h1 className="text-4xl font-bold leading-tight text-zinc-900 dark:text-zinc-100">
                     차분한 코칭과 명확한 구조로<br />
                     면접 답변을 정리하세요
                 </h1>

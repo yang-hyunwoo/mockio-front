@@ -7,16 +7,16 @@ import {ProfileCard} from "@/components/home/ProfileCard";
 
 export default async function Home() {
     const notice = await getNotice();
-  return (
-    <>
-        <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-          <HeroSection />
-          <StartCard/>
-        </section>
 
-        <PreviewSection />
-          <NoticeProfileSection notice={notice}
-                                right={<ProfileCard />}/>
-    </>
-  );
+    return (
+        <div className="space-y-10 text-zinc-900 dark:text-zinc-100">
+            <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+                <HeroSection />
+                <StartCard />
+            </section>
+
+            <PreviewSection />
+            <NoticeProfileSection notice={notice} right={<ProfileCard />} />
+        </div>
+    );
 }
