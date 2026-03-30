@@ -720,7 +720,6 @@ export default function InterviewPage() {
 
                     <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-sm text-(--brand-muted)">
-                            자동 저장: 현재 질문별로 로컬 상태에 저장 중
                         </p>
 
                         <Button
