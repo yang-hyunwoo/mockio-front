@@ -453,9 +453,9 @@ export default function SignupPage() {
                                 />
                                 <span>
                                     <span className="font-medium text-[var(--text-primary)]">
-                                        이용약관 및 개인정보 처리방침
+                                        AI 분석을 위해 외부 서비스로 데이터가 전달될 수 있음에 동의합니다.
                                     </span>
-                                    에 동의합니다.
+
                                 </span>
                             </label>
 

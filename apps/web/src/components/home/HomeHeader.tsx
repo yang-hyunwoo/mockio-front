@@ -6,16 +6,17 @@ import Link from "next/link";
 import Button from "@/components/Common/Button";
 import NotificationDropdown from "@/components/home/NotificationDropdown";
 import { useAuthStore } from "@/store/authStore";
+import {useRouter} from "next/navigation";
 
 export default function HomeHeader() {
     const accessToken = useAuthStore((s) => s.accessToken);
     const isInitialized = useAuthStore((s) => s.isInitialized);
     const isLogin = !!accessToken;
-
+    const router = useRouter()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileInterviewOpen, setMobileInterviewOpen] = useState(false);
     const [mobileMyInfoOpen, setMobileMyInfoOpen] = useState(false);
-
+    const [open, setOpen] = useState(false);
     const closeMobileMenu = () => {
         setMobileMenuOpen(false);
         setMobileInterviewOpen(false);
@@ -40,6 +41,7 @@ export default function HomeHeader() {
             window.removeEventListener("keydown", handleEscape);
         };
     }, [mobileMenuOpen]);
+
 
     return (
         <>
@@ -89,16 +91,15 @@ export default function HomeHeader() {
 
                                     <div className="absolute left-0 top-full z-50 hidden pt-3 group-hover:block">
                                         <div className="min-w-56 overflow-hidden rounded-2xl border border-white/30 bg-white/90 shadow-[0_18px_40px_rgba(20,30,50,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90">
-                                            <Link
-                                                href="/interview"
-                                                className="block px-4 py-3 text-sm transition-colors hover:bg-white/50 dark:hover:bg-white/5"
+                                            <button
+                                                onClick={() => setOpen(true)}
+                                                className="block px-4 py-3 text-sm w-full text-left hover:bg-white/50"
                                             >
                                                 면접 시작
                                                 <p className="mt-1 text-xs text-gray-500">
                                                     새로운 AI 면접을 시작합니다
                                                 </p>
-                                            </Link>
-
+                                            </button>
                                             <div className="h-px bg-black/5 dark:bg-white/10" />
 
                                             <Link
@@ -172,12 +173,7 @@ export default function HomeHeader() {
                     {isInitialized && isLogin && (
                         <>
                             <NotificationDropdown />
-                            <Link
-                                href="/interview"
-                                className="inline-flex h-10 items-center rounded-full bg-[var(--brand-primary)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
-                            >
-                                면접 시작
-                            </Link>
+                            <div className="h-px bg-black/5 dark:bg-white/10" />
                         </>
                     )}
                 </div>
@@ -270,18 +266,20 @@ export default function HomeHeader() {
 
                                             {mobileInterviewOpen && (
                                                 <div className="border-t border-black/5 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.02]">
-                                                    <Link
-                                                        href="/interview"
-                                                        onClick={closeMobileMenu}
-                                                        className="block px-4 py-3 text-sm text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                                    <button
+                                                        onClick={() => {
+                                                            closeMobileMenu();
+                                                            setOpen(true);
+                                                        }}
+                                                        className="block px-4 py-3 text-sm w-full text-left hover:bg-white/50"
                                                     >
                                                         면접 시작
                                                         <p className="mt-1 text-xs text-gray-500">
                                                             새로운 AI 면접을 시작합니다
                                                         </p>
-                                                    </Link>
-
+                                                    </button>
                                                     <div className="h-px bg-black/5 dark:bg-white/10" />
+
 
                                                     <Link
                                                         href="/interview/history"
@@ -367,13 +365,17 @@ export default function HomeHeader() {
                                         <NotificationDropdown />
                                     </div>
 
-                                    <Link
-                                        href="/interview"
-                                        onClick={closeMobileMenu}
+                                    <button
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setOpen(true);
+                                        }}
                                         className="inline-flex h-11 w-full items-center justify-center rounded-full bg-(--brand-primary) px-4 text-sm font-semibold text-white transition-colors hover:bg-(--brand-primary-hover)"
                                     >
                                         면접 시작
-                                    </Link>
+
+                                    </button>
+
                                 </div>
                             ) : (
                                 <></>
@@ -381,7 +383,41 @@ export default function HomeHeader() {
                         </div>
                     </aside>
                 </div>
+
+            )}
+            {open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md">
+
+                        <h2 className="text-lg font-bold mb-4">AI 면접 안내</h2>
+
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            면접 답변 및 음성 데이터는 AI 분석을 위해 외부 서비스에서 처리될 수 있습니다.
+                        </p>
+
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setOpen(false)}
+                                className="px-4 py-2 text-sm bg-gray-300 rounded"
+                            >
+                                취소
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    router.push("/interview");
+                                }}
+                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
+                            >
+                                동의하고 시작
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </>
+
+
     );
 }

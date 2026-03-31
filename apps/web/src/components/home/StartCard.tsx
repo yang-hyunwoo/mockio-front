@@ -6,13 +6,14 @@ import { interviewPreferenceApi } from "@/lib/api/home/interviewPreference";
 import { Preference } from "@mockio/shared/src/api/home/Preference";
 import { logoutApi } from "@/lib/api/home/LogoutApi";
 import { useAuthStore } from "@/store/authStore";
+import {useRouter} from "next/navigation";
 
 export default function StartCard() {
     const { user, accessToken, isInitialized, clearAuth } = useAuthStore();
-
+    const router = useRouter()
     const nickname = user?.nickname;
     const isAuthed = !!accessToken;
-
+    const [open, setOpen] = useState(false);
     const [pref, setPref] = useState<Preference | null>(null);
     const [prefLoading, setPrefLoading] = useState(false);
     const [prefError, setPrefError] = useState<string | null>(null);
@@ -171,10 +172,7 @@ export default function StartCard() {
 
             {isAuthed ? (
                 <button
-                    type="button"
-                    onClick={() => {
-                        window.location.href = "/interview";
-                    }}
+                    onClick={() => setOpen(true)}
                     className="w-full rounded-2xl bg-(--brand-secondary) px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                 >
                     면접 시작
@@ -182,6 +180,39 @@ export default function StartCard() {
             ) : (
                 <Login primaryLabel="로그인" />
             )}
+
+            {open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md">
+
+                        <h2 className="text-lg font-bold mb-4">AI 면접 안내</h2>
+
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            면접 답변 및 음성 데이터는 AI 분석을 위해 외부 서비스에서 처리될 수 있습니다.
+                        </p>
+
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setOpen(false)}
+                                className="px-4 py-2 text-sm bg-gray-300 rounded"
+                            >
+                                취소
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    router.push("/interview");
+                                }}
+                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
+                            >
+                                동의하고 시작
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
