@@ -5,7 +5,7 @@ import {
     FEEDBACK_STYLE_OPTIONS,
     DIFFICULTY_OPTIONS,
     QUESTION_COUNT_OPTIONS,
-    TRACK,
+    TRACK, ANSWERS_STYLE_OPTIONS,
 } from "@mockio/shared/src/api/mypage/MyPageEnum";
 import { Brain, Settings2 } from "lucide-react";
 import type { InterviewPreferenceForm } from "@/app/(site)/mypage/page";
@@ -162,7 +162,31 @@ export default function MyPagePreferenceSection({
                         한 번의 면접에서 진행할 기본 질문 개수를 선택할 수 있습니다.
                     </p>
                 </div>
+                <div>
+                    <label className="mb-2 block text-sm font-semibold text-foreground">
+                        답변 타입
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                        {ANSWERS_STYLE_OPTIONS.map((option) => (
+                            <button
+                                key={option.value}
+                                type="button"
+                                onClick={() =>
+                                    onPreferenceChange("interviewMode", option.value)
+                                }
+                                disabled={preferenceSaving}
+                                className={getOptionButtonClass(
+                                    preference.interviewMode === option.value
+                                )}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
+
+
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-(--brand-muted)">

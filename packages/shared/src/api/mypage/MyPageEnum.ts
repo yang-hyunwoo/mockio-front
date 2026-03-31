@@ -44,6 +44,8 @@ export type AnswerTimeSeconds = 60 |
     180 |
     240;
 
+export type interviewMode = "TEXT" |
+    "VOICE" ;
 
 export const FEEDBACK_STYLE_OPTIONS: { value: FeedbackStyle; label: string }[] = [
     { value: "FRIENDLY", label: "부드럽게" },
@@ -56,6 +58,11 @@ export const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
     { value: "MEDIUM", label: "보통" },
     { value: "HARD", label: "어려움" },
 ];
+
+export const ANSWERS_STYLE_OPTIONS: {value: interviewMode; label: string  }[] = [
+    {value: "TEXT", label:"텍스트"},
+    {value:"VOICE", label:"보이스"}
+]
 
 export const QUESTION_COUNT_OPTIONS: { value: QuestionCount; label: string }[] = [
     { value: 3, label: "3개" },

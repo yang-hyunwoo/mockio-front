@@ -9,6 +9,10 @@ import {
     MessageSquareWarning,
     BadgeCheck,
     XCircle,
+    Mic,
+    Square,
+    RotateCcw,
+    Volume2,
 } from "lucide-react"
 import Button from "@/components/Common/Button"
 import { InterviewQuestionApi } from "@/lib/api/interview/InterviewQuestionApi"
@@ -18,7 +22,9 @@ import { InterviewAnswerReadApi } from "@/lib/api/interview/InterviewAnswerReadA
 import { FeedbackDetailApi } from "@/lib/api/interview/FeedbackDetailApi"
 import { FeedbackResponse } from "@mockio/shared/src/api/interview/FeedbackDetail"
 import { InterviewExitApi } from "@/lib/api/interview/InterviewExitApi"
+import { InterviewSttApi } from "@/lib/api/interview/InterviewSttApi"
 
+type AnswerMode = "TEXT" | "VOICE"
 
 export default function InterviewPage() {
     const [questions, setQuestions] = useState<InterviewQuestion[]>([])
@@ -29,18 +35,30 @@ export default function InterviewPage() {
     const [isTerminating, setIsTerminating] = useState(false)
     const [isExited, setIsExited] = useState(false)
 
+    const [answerMode, setAnswerMode] = useState<AnswerMode>("TEXT")
+
     const [answers, setAnswers] = useState<Record<number, string>>({})
     const [feedbackByQuestionId, setFeedbackByQuestionId] = useState<Record<number, FeedbackResponse>>({})
     const [submittedQuestionIds, setSubmittedQuestionIds] = useState<Record<number, boolean>>({})
     const [expiredQuestionIds, setExpiredQuestionIds] = useState<Record<number, boolean>>({})
     const [startedAtByQuestionId, setStartedAtByQuestionId] = useState<Record<number, number>>({})
+    const [deadlineAtByQuestionId, setDeadlineAtByQuestionId] = useState<Record<number, number>>({})
     const [submittedDurationByQuestionId, setSubmittedDurationByQuestionId] = useState<Record<number, number>>({})
-    const [answerDurationSeconds, setAnswerDurationSeconds] = useState(0)
+    const [now, setNow] = useState(Date.now())
+
+    const [audioUrlByQuestionId, setAudioUrlByQuestionId] = useState<Record<number, string>>({})
+    const [audioFileByQuestionId, setAudioFileByQuestionId] = useState<Record<number, File>>({})
+    const [isRecording, setIsRecording] = useState(false)
+    const [recordingQuestionId, setRecordingQuestionId] = useState<number | null>(null)
+    const [isTranscribing, setIsTranscribing] = useState(false)
 
     const initializedRef = useRef(false)
     const startInterviewKeyRef = useRef<string | null>(null)
-    const intervalRef = useRef<number | null>(null)
     const feedbackPollingMapRef = useRef<Record<number, number | null>>({})
+
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+    const streamRef = useRef<MediaStream | null>(null)
+    const audioChunksRef = useRef<Blob[]>([])
 
     const current = questions[index]
 
@@ -64,6 +82,8 @@ export default function InterviewPage() {
                     setIsInitializing(false)
                     return
                 }
+
+                setAnswerMode((result.interviewMode?.code as AnswerMode) ?? "TEXT")
 
                 if (result.completed) {
                     setIsCompleted(true)
@@ -91,6 +111,16 @@ export default function InterviewPage() {
         }
 
         void fetchInterview()
+    }, [])
+
+    useEffect(() => {
+        const timerId = window.setInterval(() => {
+            setNow(Date.now())
+        }, 1000)
+
+        return () => {
+            window.clearInterval(timerId)
+        }
     }, [])
 
     useEffect(() => {
@@ -135,87 +165,65 @@ export default function InterviewPage() {
 
     useEffect(() => {
         if (!current) return
+        if (startedAtByQuestionId[current.id]) return
 
-        setStartedAtByQuestionId((prev) => {
-            if (prev[current.id]) return prev
+        const startedAt = Date.now()
 
-            return {
-                ...prev,
-                [current.id]: Date.now(),
-            }
-        })
-    }, [current?.id])
+        setStartedAtByQuestionId((prev) => ({
+            ...prev,
+            [current.id]: startedAt,
+        }))
 
-    useEffect(() => {
-        if (!current) return
-
-        if (intervalRef.current) {
-            window.clearInterval(intervalRef.current)
-            intervalRef.current = null
-        }
-
-        if (submittedQuestionIds[current.id]) {
-            setAnswerDurationSeconds(submittedDurationByQuestionId[current.id] ?? 0)
-            return
-        }
-
-        const updateDuration = () => {
-            const startedAt = startedAtByQuestionId[current.id]
-
-            if (!startedAt) {
-                setAnswerDurationSeconds(0)
-                return
-            }
-
-            const diff = Math.floor((Date.now() - startedAt) / 1000)
-            setAnswerDurationSeconds(diff)
-        }
-
-        updateDuration()
-
-        intervalRef.current = window.setInterval(() => {
-            updateDuration()
-        }, 1000)
-
-        return () => {
-            if (intervalRef.current) {
-                window.clearInterval(intervalRef.current)
-                intervalRef.current = null
-            }
-        }
-    }, [current?.id, startedAtByQuestionId, submittedQuestionIds, submittedDurationByQuestionId])
+        setDeadlineAtByQuestionId((prev) => ({
+            ...prev,
+            [current.id]: startedAt + (current.timeLimitSec ?? 0) * 1000,
+        }))
+    }, [current?.id, current?.timeLimitSec, startedAtByQuestionId])
 
     useEffect(() => {
         return () => {
-            if (intervalRef.current) {
-                window.clearInterval(intervalRef.current)
-            }
-
             Object.values(feedbackPollingMapRef.current).forEach((timerId) => {
                 if (timerId) {
                     window.clearInterval(timerId)
                 }
             })
+
+            Object.values(audioUrlByQuestionId).forEach((url) => {
+                URL.revokeObjectURL(url)
+            })
+
+            stopStreamTracks()
         }
-    }, [])
+    }, [audioUrlByQuestionId])
 
     const isCurrentSubmitted = current ? !!submittedQuestionIds[current.id] : false
     const isCurrentExpired = current ? !!expiredQuestionIds[current.id] : false
 
+    const currentStartedAt = current ? startedAtByQuestionId[current.id] : null
+    const currentDeadlineAt = current ? deadlineAtByQuestionId[current.id] : null
+    const submittedDuration = current ? submittedDurationByQuestionId[current.id] ?? 0 : 0
+
+    const elapsedSec =
+        currentStartedAt
+            ? Math.max(Math.floor((now - currentStartedAt) / 1000), 0)
+            : 0
+
     const remainingSec =
-        typeof current?.timeLimitSec === "number"
-            ? Math.max(current.timeLimitSec - answerDurationSeconds, 0)
-            : null
+        currentDeadlineAt
+            ? Math.max(Math.floor((currentDeadlineAt - now + 999) / 1000), 0)
+            : (current?.timeLimitSec ?? 0)
 
     const currentAnswer = current ? answers[current.id] ?? "" : ""
     const currentFeedback = current ? feedbackByQuestionId[current.id] : null
+    const currentAudioUrl = current ? audioUrlByQuestionId[current.id] : ""
+    const isCurrentRecording = isRecording && recordingQuestionId === current?.id
 
     const isFeedbackPending = currentFeedback?.status.code === "PENDING"
     const isFeedbackSucceeded = currentFeedback?.status.code === "SUCCEEDED"
     const isFeedbackFailed = currentFeedback?.status.code === "FAILED"
     const isFeedbackSkipped = currentFeedback?.status.code === "SKIPPED"
 
-    const displaySec = isCurrentSubmitted ? answerDurationSeconds : remainingSec
+    const displaySec = isCurrentSubmitted ? submittedDuration : remainingSec
     const timerLabel = isCurrentSubmitted ? "답변 시간" : "남은 시간"
 
     const onChangeAnswer = (text: string) => {
@@ -399,10 +407,6 @@ export default function InterviewPage() {
                 alert("면접 종료에 실패했습니다. 잠시 후 다시 시도해 주세요.")
                 return
             }
-            if (intervalRef.current) {
-                window.clearInterval(intervalRef.current)
-                intervalRef.current = null
-            }
 
             Object.values(feedbackPollingMapRef.current).forEach((timerId) => {
                 if (timerId) {
@@ -423,13 +427,10 @@ export default function InterviewPage() {
         if (submittedQuestionIds[current.id]) return
         if (expiredQuestionIds[current.id]) return
 
-        const startedAt = startedAtByQuestionId[current.id]
-        if (!startedAt) return
+        const deadlineAt = deadlineAtByQuestionId[current.id]
+        if (!deadlineAt) return
 
-        const elapsed = Math.floor((Date.now() - startedAt) / 1000)
-        const timeLimit = current.timeLimitSec ?? 0
-
-        if (elapsed < timeLimit) return
+        if (now < deadlineAt) return
 
         setExpiredQuestionIds((prev) => ({
             ...prev,
@@ -438,13 +439,12 @@ export default function InterviewPage() {
 
         void submitQuestion(current, { autoSubmit: true })
     }, [
+        now,
         current?.id,
-        current?.timeLimitSec,
         isSubmitting,
         submittedQuestionIds,
         expiredQuestionIds,
-        startedAtByQuestionId,
-        answerDurationSeconds,
+        deadlineAtByQuestionId,
     ])
 
     const getQuestionGuideText = (typeCode?: string) => {
@@ -520,10 +520,146 @@ export default function InterviewPage() {
         return "border-red-500/40 bg-red-500/15 text-red-600 dark:text-red-300"
     }
 
+    const stopStreamTracks = () => {
+        streamRef.current?.getTracks().forEach((track) => track.stop())
+        streamRef.current = null
+    }
+
+    const startRecording = async () => {
+        if (!current) return
+        if (isCurrentSubmitted || isCurrentExpired || isTranscribing) return
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+            streamRef.current = stream
+
+            const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+                ? "audio/webm"
+                : ""
+
+            const recorder = mimeType
+                ? new MediaRecorder(stream, { mimeType })
+                : new MediaRecorder(stream)
+
+            audioChunksRef.current = []
+        console.log(mimeType);
+            console.log(recorder);
+
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data)
+                }
+            }
+
+            recorder.onstop = async () => {
+                const blob = new Blob(audioChunksRef.current, {
+                    type: mimeType || "audio/webm",
+                })
+
+                const file = new File([blob], `interview-answer-${current.id}.webm`, {
+                    type: blob.type,
+                })
+
+                const newAudioUrl = URL.createObjectURL(blob)
+
+                setAudioUrlByQuestionId((prev) => {
+                    const oldUrl = prev[current.id]
+                    if (oldUrl) {
+                        URL.revokeObjectURL(oldUrl)
+                    }
+
+                    return {
+                        ...prev,
+                        [current.id]: newAudioUrl,
+                    }
+                })
+
+                setAudioFileByQuestionId((prev) => ({
+                    ...prev,
+                    [current.id]: file,
+                }))
+
+                stopStreamTracks()
+                setIsRecording(false)
+                setRecordingQuestionId(null)
+
+                await requestStt(current.id, file)
+            }
+
+            mediaRecorderRef.current = recorder
+            recorder.start()
+            setIsRecording(true)
+            setRecordingQuestionId(current.id)
+        } catch (error) {
+            console.error(error)
+            alert("마이크 권한을 확인해주세요.")
+            stopStreamTracks()
+            setIsRecording(false)
+            setRecordingQuestionId(null)
+        }
+    }
+
+
+    const stopRecording = () => {
+        mediaRecorderRef.current?.stop()
+        mediaRecorderRef.current = null
+    }
+
+    const requestStt = async (questionId: number, file: File) => {
+        try {
+            setIsTranscribing(true)
+
+            const res = await InterviewSttApi(file, current.interviewId)
+
+            if (!res) {
+                alert("음성 텍스트 변환에 실패했습니다.")
+                return
+            }
+
+            setAnswers((prev) => ({
+                ...prev,
+                [questionId]: res.text ?? "",
+            }))
+        } finally {
+            setIsTranscribing(false)
+        }
+    }
+
+    const rerecordCurrent = async () => {
+        if (!current) return
+        if (isCurrentSubmitted || isCurrentExpired || isTranscribing) return
+
+        const oldUrl = audioUrlByQuestionId[current.id]
+        if (oldUrl) {
+            URL.revokeObjectURL(oldUrl)
+        }
+
+        setAudioUrlByQuestionId((prev) => {
+            const next = { ...prev }
+            delete next[current.id]
+            return next
+        })
+
+        setAudioFileByQuestionId((prev) => {
+            const next = { ...prev }
+            delete next[current.id]
+            return next
+        })
+
+        setAnswers((prev) => ({
+            ...prev,
+            [current.id]: "",
+        }))
+
+        await startRecording()
+    }
+
     const timerTextClass =
         !isCurrentSubmitted && remainingSec !== null && remainingSec <= 10
             ? "text-red-400"
             : "text-foreground"
+
+    const isVoiceMode = answerMode === "VOICE"
 
     if (isInitializing) {
         return (
@@ -582,6 +718,9 @@ export default function InterviewPage() {
                     <p className="mt-1 text-sm text-(--brand-muted)">
                         질문 {index + 1} / {questions.length}
                     </p>
+                    <p className="mt-1 text-xs text-(--brand-muted)">
+                        답변 방식: {isVoiceMode ? "보이스" : "텍스트"}
+                    </p>
                 </div>
 
                 <div className="flex flex-col items-stretch gap-3 sm:min-w-[180px]">
@@ -608,6 +747,11 @@ export default function InterviewPage() {
                             제한 {Math.floor((current.timeLimitSec ?? 0) / 60)}분{" "}
                             {Math.floor((current.timeLimitSec ?? 0) % 60)}초
                         </p>
+                        {!isCurrentSubmitted && (
+                            <p className="mt-1 text-[11px] text-(--brand-muted)">
+                                경과 시간 {formatMMSS(elapsedSec)}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -690,19 +834,97 @@ export default function InterviewPage() {
                                 onClick={index === questions.length - 1 ? submitCurrent : goNext}
                                 disabled={!isCurrentSubmitted && index !== questions.length - 1}
                             >
-                               다음
-                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                다음
+                                <ChevronRight className="ml-1 h-4 w-4" />
                             </Button>
                         </div>
                     </div>
 
-                    <textarea
-                        value={currentAnswer}
-                        onChange={(e) => onChangeAnswer(e.target.value)}
-                        disabled={isCurrentSubmitted || isCurrentExpired}
-                        className="min-h-70 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
-                        placeholder="답변을 입력해 주세요."
-                    />
+                    {isVoiceMode ? (
+                        <div className="space-y-4">
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                <p className="text-sm text-(--brand-muted)">
+                                    보이스 모드입니다. 먼저 답변을 녹음하면 텍스트로 변환됩니다.
+                                </p>
+                                <p className="mt-1 text-xs text-(--brand-muted)">
+                                    변환된 텍스트는 수정한 뒤 제출할 수 있습니다.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {!isCurrentRecording ? (
+                                    <Button
+                                        className="rounded-xl"
+                                        onClick={startRecording}
+                                        disabled={isCurrentSubmitted || isCurrentExpired || isTranscribing || isSubmitting}
+                                    >
+                                        <Mic className="mr-2 h-4 w-4" />
+                                        녹음 시작
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/15 dark:text-red-300"
+                                        onClick={stopRecording}
+                                    >
+                                        <Square className="mr-2 h-4 w-4" />
+                                        녹음 종료
+                                    </Button>
+                                )}
+
+                                {!!currentAudioUrl && !isCurrentRecording && (
+                                    <Button
+                                        className="rounded-xl"
+                                        onClick={rerecordCurrent}
+                                        disabled={isCurrentSubmitted || isCurrentExpired || isTranscribing || isSubmitting}
+                                    >
+                                        <RotateCcw className="mr-2 h-4 w-4" />
+                                        다시 녹음
+                                    </Button>
+                                )}
+                            </div>
+
+                            {isCurrentRecording && (
+                                <p className="text-sm text-red-400">
+                                    녹음 중입니다. 답변이 끝나면 녹음 종료를 눌러주세요.
+                                </p>
+                            )}
+
+                            {isTranscribing && (
+                                <p className="text-sm text-sky-400">
+                                    음성을 텍스트로 변환 중입니다...
+                                </p>
+                            )}
+
+                            {!!currentAudioUrl && (
+                                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                    <div className="mb-2 flex items-center gap-2 text-sm text-foreground">
+                                        <Volume2 className="h-4 w-4" />
+                                        <span>녹음된 답변</span>
+                                    </div>
+
+                                    <audio controls src={currentAudioUrl} className="w-full" />
+                                </div>
+                            )}
+
+                            {(!!currentAudioUrl || !!currentAnswer) && (
+                                <textarea
+                                    value={currentAnswer}
+                                    onChange={(e) => onChangeAnswer(e.target.value)}
+                                    disabled={isCurrentSubmitted || isCurrentExpired || isTranscribing}
+                                    className="min-h-70 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                                    placeholder="음성 답변이 텍스트로 변환되면 여기에 표시됩니다."
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <textarea
+                            value={currentAnswer}
+                            onChange={(e) => onChangeAnswer(e.target.value)}
+                            disabled={isCurrentSubmitted || isCurrentExpired}
+                            className="min-h-70 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                            placeholder="답변을 입력해 주세요."
+                        />
+                    )}
 
                     <div className="mt-3 flex flex-col gap-2">
                         {isCurrentExpired && !isCurrentSubmitted && (
@@ -720,12 +942,22 @@ export default function InterviewPage() {
 
                     <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-sm text-(--brand-muted)">
+                            {isVoiceMode && !currentAnswer && !isCurrentSubmitted
+                                ? "녹음 후 변환된 텍스트를 확인하고 제출해 주세요."
+                                : ""}
                         </p>
 
                         <Button
                             className="rounded-xl"
                             onClick={submitCurrent}
-                            disabled={isSubmitting || isCurrentSubmitted || isCurrentExpired || isTerminating}
+                            disabled={
+                                isSubmitting ||
+                                isCurrentSubmitted ||
+                                isCurrentExpired ||
+                                isTerminating ||
+                                isTranscribing ||
+                                (isVoiceMode && !currentAnswer.trim())
+                            }
                         >
                             <Send className="mr-2 h-4 w-4" />
                             {isCurrentSubmitted

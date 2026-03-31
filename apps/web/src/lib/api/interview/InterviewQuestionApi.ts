@@ -2,6 +2,7 @@ import {api} from "@/lib/axios";
 import {getClientApiEndpoints} from "@/lib/api";
 import {AxiosRequestConfig} from "axios";
 import {InterviewQuestionViewModel} from "@mockio/shared/src/api/view/Interview/InterviewQuestionViewModel";
+import {EnumResponse} from "@mockio/shared/src/api/EnumResponse";
 
 type LoadingType = "top" | "center" | "none"
 
@@ -15,7 +16,8 @@ export type InterviewQuestionReadResponse = {
     questions: InterviewQuestionViewModel[]
     interviewId: number
     completed: boolean,
-    answerTimeSeconds: number
+    answerTimeSeconds: number,
+    interviewMode : EnumResponse
 }
 
 type StartInterviewRequest = {

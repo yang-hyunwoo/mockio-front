@@ -7,7 +7,7 @@ import {
     Difficulty,
     FeedbackStyle,
     AnswerTimeSeconds,
-    QuestionCount,
+    QuestionCount, interviewMode,
 } from "@mockio/shared/src/api/mypage/MyPageEnum";
 import { MyPageResponse } from "@mockio/shared/src/api/mypage/MyPageResponse";
 import MyPageProfileSection from "@/components/mypage/MyPageProfileSection";
@@ -29,6 +29,7 @@ export interface InterviewPreferenceForm {
     difficulty: Difficulty;
     feedbackStyle: FeedbackStyle;
     answerTimeSeconds: AnswerTimeSeconds;
+    interviewMode : interviewMode;
     questionCount: QuestionCount;
 }
 
@@ -54,6 +55,7 @@ const mapMyPageResponseToPreference = (
     feedbackStyle: data.interviewSettingResponse.feedbackStyle.code as FeedbackStyle,
     answerTimeSeconds:
         data.interviewSettingResponse.answerTimeSeconds as AnswerTimeSeconds,
+    interviewMode: data.interviewSettingResponse.interviewMode.code as interviewMode,
     questionCount:
         data.interviewSettingResponse.questionCount as QuestionCount,
 });
