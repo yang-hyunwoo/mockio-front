@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Mockio",
-    description: "모의 면접",
-};
+    title: 'Mockio | AI 기반 모의면접 서비스',
+    description: '직무 정보를 바탕으로 맞춤형 면접 질문을 생성하고 연습할 수 있는 서비스',
+}
 
 export default function RootLayout({
                                        children,
