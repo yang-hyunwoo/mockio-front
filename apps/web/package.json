@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@mockio/shared": "file:../../packages/shared",
+    "@scalar/api-reference": "^1.49.8",
+    "@scalar/api-reference-react": "^0.9.18",
     "axios": "^1.13.4",
     "dayjs": "^1.11.20",
     "lucide-react": "^0.576.0",

@@ -1,0 +1,114 @@
+/* docs-shell 자체 배경 */
+.docs-shell {
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+/* Notion 같은 밝은 톤 */
+.docs-shell .light-mode {
+    --scalar-color-1: #191919;
+    --scalar-color-2: rgba(25, 25, 25, 0.7);
+    --scalar-color-3: rgba(25, 25, 25, 0.45);
+
+    --scalar-background-1: #ffffff;
+    --scalar-background-2: #f7f7f5;
+    --scalar-background-3: #efefec;
+    --scalar-background-accent: #f1f1ee;
+
+    --scalar-border-color: rgba(15, 15, 15, 0.08);
+    --scalar-color-accent: #2f76ff;
+}
+
+/* 좌측 사이드바 */
+.docs-shell .sidebar {
+    --scalar-sidebar-background-1: #fbfbfa;
+    --scalar-sidebar-color-1: #191919;
+    --scalar-sidebar-color-2: rgba(25, 25, 25, 0.58);
+    --scalar-sidebar-color-active: #191919;
+    --scalar-sidebar-item-hover-background: #f1f1ef;
+    --scalar-sidebar-item-active-background: #ecece8;
+    --scalar-sidebar-border-color: rgba(15, 15, 15, 0.06);
+    --scalar-sidebar-search-background: #ffffff;
+    --scalar-sidebar-search-border-color: rgba(15, 15, 15, 0.08);
+    --scalar-sidebar-search-color: rgba(25, 25, 25, 0.55);
+}
+
+/* 전체 글자 느낌 */
+.docs-shell {
+    font-family:
+            ui-sans-serif,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            "Noto Sans KR",
+            sans-serif;
+}
+
+/* 메인 본문 폭과 여백 */
+.docs-shell .scalar-app,
+.docs-shell .references-rendered,
+.docs-shell .reference-layout {
+    background: #ffffff !important;
+}
+
+.docs-shell .reference-header,
+.docs-shell .section-container,
+.docs-shell .section-content {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 제목 톤 */
+.docs-shell h1,
+.docs-shell h2,
+.docs-shell h3 {
+    color: #191919 !important;
+    letter-spacing: -0.02em;
+}
+
+/* 코드블럭은 너무 진하지 않게 */
+.docs-shell pre,
+.docs-shell code {
+    border-radius: 10px !important;
+}
+
+/* 우측 불필요 박스 숨기기 */
+.docs-shell .scalar-client-libraries,
+.docs-shell [data-testid="client-libraries"],
+.docs-shell .scalar-server,
+.docs-shell [data-testid="server"] {
+    display: none !important;
+}
+
+/* 상단 툴바가 과하면 제거 */
+.docs-shell .scalar-toolbar {
+    border-bottom: 1px solid rgba(15, 15, 15, 0.06) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 우측 operation 카드 톤 완화 */
+.docs-shell .card,
+.docs-shell .request-card,
+.docs-shell .response-card {
+    border: 1px solid rgba(15, 15, 15, 0.06) !important;
+    box-shadow: none !important;
+    border-radius: 14px !important;
+}
+
+/* 좌측 메뉴 글씨 크기 약간 정리 */
+.docs-shell .sidebar * {
+    font-size: 14px;
+}
+
+.scalar-notion-shell .scalar-reference-intro-server,
+.scalar-notion-shell .introduction-card-item.scalar-reference-intro-server {
+    display: none !important;
+}
+
+.sticky-cards {
+    display: none !important;
+}
+
+.scalar-notion-shell button.bg-sidebar-b-search {
+    display: none !important;
+}
