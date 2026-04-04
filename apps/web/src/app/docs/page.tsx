@@ -12,15 +12,18 @@ export default function ApiDocsPage() {
                     sources: [
                         {
                             title: "Auth Service",
-                            url: "http://localhost:9000/docs/auth/v3/api-docs",
+                            // url: "http://localhost:9000/docs/auth/v3/api-docs",
+                            url: "https://mockio.cloud/docs/auth/v3/api-docs",
                         },
                         {
                             title: "Core Service",
-                            url: "http://localhost:9000/docs/core/v3/api-docs",
+                            // url: "http://localhost:9000/docs/core/v3/api-docs",
+                            url: "https://mockio.cloud/docs/core/v3/api-docs",
                         },
                         {
                             title: "Support Service",
-                            url: "http://localhost:9000/docs/support/v3/api-docs",
+                            // url: "http://localhost:9000/docs/support/v3/api-docs",
+                            url: "https://mockio.cloud/docs/support/v3/api-docs",
                         },
                     ],
                     theme: "default",
