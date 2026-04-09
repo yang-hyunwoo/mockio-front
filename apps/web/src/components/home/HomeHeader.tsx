@@ -7,6 +7,8 @@ import Button from "@/components/Common/Button";
 import NotificationDropdown from "@/components/home/NotificationDropdown";
 import { useAuthStore } from "@/store/authStore";
 import {useRouter} from "next/navigation";
+import {Preference} from "@mockio/shared/src/api/home/Preference";
+import {interviewPreferenceApi} from "@/lib/api/home/interviewPreference";
 
 export default function HomeHeader() {
     const accessToken = useAuthStore((s) => s.accessToken);
@@ -22,6 +24,7 @@ export default function HomeHeader() {
         setMobileInterviewOpen(false);
         setMobileMyInfoOpen(false);
     };
+    const [pref, setPref] = useState<Preference | null>(null);
 
     useEffect(() => {
         if (!mobileMenuOpen) return;
@@ -42,6 +45,45 @@ export default function HomeHeader() {
         };
     }, [mobileMenuOpen]);
 
+
+    useEffect(() => {
+        if (!isInitialized) return;
+
+        if (!isLogin) {
+            setPref(null);
+            return;
+        }
+
+        let cancelled = false;
+
+
+        interviewPreferenceApi()
+            .then((data) => {
+                if (cancelled) return;
+
+                if (!data) {
+                    setPref(null);
+                    return;
+                }
+
+                setPref(data);
+            })
+            .catch((e) => {
+                if (cancelled) return;
+                setPref(null);
+            })
+            .finally(() => {
+                if (cancelled) return;
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isInitialized, isLogin]);
+
+
+    const interviewKeyword = pref?.interviewKeyword ?? [];
+    const hasKeyword = interviewKeyword.length > 0;
 
     return (
         <>
@@ -383,34 +425,52 @@ export default function HomeHeader() {
                         </div>
                     </aside>
                 </div>
-
             )}
+
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md">
+                <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md">
 
                         <h2 className="text-lg font-bold mb-4">AI 면접 안내</h2>
 
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                             면접 답변 및 음성 데이터는 AI 분석을 위해 외부 서비스에서 처리될 수 있습니다.
                         </p>
+                        {/* 키워드 안내 (없을 때만) */}
+                        {!hasKeyword && (
+                            <div className="mt-4 mb-5 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
+                                면접 키워드를 설정하면 사용자의 기술 스택에 맞는 더 정확한 질문을 받을 수 있습니다.
+                            </div>
+                        )}
 
-                        <div className="flex justify-end gap-2">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setOpen(false)}
-                                className="px-4 py-2 text-sm bg-gray-300 rounded"
+                                className="mr-auto px-4 py-2 text-sm text-gray-400 hover:text-gray-600"
                             >
                                 취소
                             </button>
+
+                            {!hasKeyword && (
+                                <button
+                                    onClick={() => {
+                                        setOpen(false);
+                                        router.push("/mypage");
+                                    }}
+                                    className="px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-600 rounded-xl"
+                                >
+                                    키워드 설정하기
+                                </button>
+                            )}
 
                             <button
                                 onClick={() => {
                                     setOpen(false);
                                     router.push("/interview");
                                 }}
-                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded"
+                                className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-xl"
                             >
-                                동의하고 시작
+                                {hasKeyword ? "동의하고 시작" : "그냥 시작하기"}
                             </button>
                         </div>
                     </div>

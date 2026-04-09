@@ -15,6 +15,7 @@ export const interviewPreferenceApi = async (): Promise<Preference | null> => {
             trackLabel: data?.track?.label ?? "",
             feedbackStyleLabel: data?.feedbackStyle?.label ?? "",
             difficultyLabel: data?.difficulty?.label ?? "",
+            interviewKeyword : data?.interviewKeyword ?? [],
         };
     } catch (e) {
         return null;

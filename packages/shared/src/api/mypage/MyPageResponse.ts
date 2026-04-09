@@ -15,6 +15,7 @@ export interface UserInterviewSettingReadResponse {
     interviewMode: EnumResponse
     answerTimeSeconds: number
     questionCount: number
+    interviewKeyword : string[]
 }
 
 export interface MyPageResponse {

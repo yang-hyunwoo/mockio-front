@@ -31,7 +31,7 @@ export default function HeroSection() {
 
             <div className="grid gap-4 sm:grid-cols-3">
                 {[
-                    { title: "직무 맞춤 세션", desc: "목표 직무와 레벨에 맞춘 질문을 제공합니다." },
+                    { title: "직무 맞춤 세션", desc: "목표 직무와 직무 키워드, 레벨에 맞춘 질문을 제공합니다." },
                     { title: "부담 낮은 루틴", desc: "짧은 세션으로 일상 속에서 꾸준히 연습합니다." },
                     { title: "실행 가능한 피드백", desc: "명확성, 구조, 깊이를 바로 개선할 수 있게 안내합니다." },
                 ].map((item) => (

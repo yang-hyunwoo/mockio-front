@@ -26,11 +26,13 @@ export interface ProfileForm {
 
 export interface InterviewPreferenceForm {
     track: Track;
+    interviewKeyword?: string[];
     difficulty: Difficulty;
     feedbackStyle: FeedbackStyle;
     answerTimeSeconds: AnswerTimeSeconds;
     interviewMode : interviewMode;
     questionCount: QuestionCount;
+
 }
 
 const EMPTY_PROFILE: ProfileForm = {
@@ -51,6 +53,7 @@ const mapMyPageResponseToPreference = (
     data: MyPageResponse
 ): InterviewPreferenceForm => ({
     track: data.interviewSettingResponse.track.code as Track,
+    interviewKeyword: data.interviewSettingResponse.interviewKeyword ,
     difficulty: data.interviewSettingResponse.difficulty.code as Difficulty,
     feedbackStyle: data.interviewSettingResponse.feedbackStyle.code as FeedbackStyle,
     answerTimeSeconds:

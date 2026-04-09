@@ -127,12 +127,7 @@ export default function PreviewPage() {
                             </p>
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {isLogin ? (
-                                    <Link
-                                        href="/interview"
-                                        className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-primary-hover)]"
-                                    >
-                                        면접 시작하기
-                                    </Link>
+                                    <></>
                                 ) : (
                                     <Link
                                         href="/login"
