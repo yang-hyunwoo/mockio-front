@@ -79,7 +79,7 @@ export default function HomeHeader() {
         return () => {
             cancelled = true;
         };
-    }, [isInitialized, isLogin]);
+    }, [isInitialized, isLogin,open]);
 
 
     const interviewKeyword = pref?.interviewKeyword ?? [];

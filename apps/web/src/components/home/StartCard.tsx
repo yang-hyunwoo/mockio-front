@@ -66,7 +66,7 @@ export default function StartCard() {
         return () => {
             cancelled = true;
         };
-    }, [isInitialized, isAuthed]);
+    }, [isInitialized, isAuthed,open]);
 
     const handleLogout = async () => {
         try {
