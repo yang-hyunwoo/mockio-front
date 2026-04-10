@@ -99,21 +99,41 @@ const renderImprovementContent = (item: InterviewQuestionFeedbackItem) => {
             </p>
         )
     }
-
     if (item.improvements?.length) {
         return (
             <ul className="mt-3 space-y-2">
-                {item.improvements.map((point, index) => (
-                    <li
-                        key={index}
-                        className="flex items-start gap-2 text-sm leading-6 text-(--brand-muted)"
-                    >
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-400" />
-                        {point}
-                    </li>
-                ))}
+                {item.improvements.map((point, index) => {
+                    return (
+                        <li
+                            key={index}
+                            className="flex items-start gap-2 text-sm leading-6 text-(--brand-muted)"
+                        >
+                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-400" />
+
+                            <div>
+                                <p className="text-foreground">
+                                    {point.problem}
+                                </p>
+                                <p className="text-(--brand-muted)">
+                                    → {point.action}
+                                </p>
+
+                                {point.example && (
+                                    <details className="mt-1">
+                                        <summary className="cursor-pointer text-xs text-amber-400">
+                                            예시 보기
+                                        </summary>
+                                        <p className="mt-1 text-xs text-(--brand-muted)">
+                                            {point.example}
+                                        </p>
+                                    </details>
+                                )}
+                            </div>
+                        </li>
+                    );
+                })}
             </ul>
-        )
+        );
     }
 
     return (
@@ -131,6 +151,17 @@ const dimensionItems = (feedbackDimensions?: {
     { label: "구조성", value: feedbackDimensions?.structure ?? 0 },
     { label: "명확성", value: feedbackDimensions?.clarity ?? 0 },
     { label: "구체성", value: feedbackDimensions?.specificity ?? 0 },
+]
+
+
+const jobMetricItems = (feedbackJobMetrics?: {
+    practicality?: number
+    decisionMaking?: number
+    tradeoff?: number
+}) => [
+    { label: "실무 적합도", value: feedbackJobMetrics?.practicality ?? 0 },
+    { label: "의사결정 기준", value: feedbackJobMetrics?.decisionMaking ?? 0 },
+    { label: "트래이드오프 이해", value: feedbackJobMetrics?.tradeoff ?? 0 },
 ]
 
 export default function InterviewResultPage({
@@ -208,6 +239,9 @@ export default function InterviewResultPage({
 
     const handleRetry = async () => {
         await executeRetry()
+    }
+    const handleTest = async () => {
+        window.location.href="/interview/compare"
     }
 
     const handleContinueInterview = () => {
@@ -415,6 +449,11 @@ export default function InterviewResultPage({
                                     <RotateCcw className="h-4 w-4" />
                                     {retryLoading ? "생성중..." : retryLabel}
                                 </button>
+                                <button
+                                    onClick={handleTest}
+                                >
+                                    버튼 클릭
+                                </button>
                             </div>
                         </div>
 
@@ -450,6 +489,30 @@ export default function InterviewResultPage({
                                 {!isUserExit && (
                                     <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
                                         {dimensionItems(result.feedbackDimensions).map((item) => (
+                                            <div
+                                                key={item.label}
+                                                className="rounded-2xl bg-[var(--brand-primary)]/5 p-4 ring-1 ring-[var(--brand-primary)]/10"
+                                            >
+                                                <div className="flex items-center justify-between text-xs text-(--brand-muted)">
+                                                    <span>{item.label}</span>
+                                                    <span className="font-semibold text-foreground">
+                                                        {item.value}
+                                                    </span>
+                                                </div>
+                                                <div className="mt-2 h-2 w-full rounded-full bg-black/10 dark:bg-white/10">
+                                                    <div
+                                                        className="h-2 rounded-full bg-(--brand-primary)"
+                                                        style={{ width: `${item.value}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {!isUserExit && (
+                                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                        {jobMetricItems(result.feedbackJobMetrics).map((item) => (
                                             <div
                                                 key={item.label}
                                                 className="rounded-2xl bg-[var(--brand-primary)]/5 p-4 ring-1 ring-[var(--brand-primary)]/10"
@@ -617,6 +680,29 @@ export default function InterviewResultPage({
 
                                                                 <div className="mt-3 grid gap-3 sm:grid-cols-3">
                                                                     {dimensionItems(item.dimensions).map(
+                                                                        (dimension) => (
+                                                                            <div key={dimension.label}>
+                                                                                <div className="flex items-center justify-between text-xs text-(--brand-muted)">
+                                                                                    <span>{dimension.label}</span>
+                                                                                    <span className="font-semibold text-foreground">
+                                                                                        {dimension.value}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="mt-1 h-2 w-full rounded-full bg-black/10 dark:bg-white/10">
+                                                                                    <div
+                                                                                        className="h-2 rounded-full bg-(--brand-primary)"
+                                                                                        style={{
+                                                                                            width: `${dimension.value}%`,
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                                                                    {jobMetricItems(item.jobMetrics).map(
                                                                         (dimension) => (
                                                                             <div key={dimension.label}>
                                                                                 <div className="flex items-center justify-between text-xs text-(--brand-muted)">

@@ -9,6 +9,12 @@ export interface FeedbackResponse  {
     score: number | null
     summary: string | null
     strengths: string[]
-    improvements: string[]
+    improvements: FeedbackImprovement[]
     modelAnswer: string | null
+}
+
+interface FeedbackImprovement {
+    problem: string
+    action: string
+    example: string
 }

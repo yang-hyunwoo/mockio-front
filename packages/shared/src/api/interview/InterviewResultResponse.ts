@@ -10,16 +10,29 @@ export interface InterviewQuestionFeedbackItem {
     score: number
     type : EnumResponse,
     strengths: string[],
-    improvements: string[]
+    improvements: FeedbackImprovement[]
     dimensions : FeedbackDimensions
+    jobMetrics : FeedbackJobMetrics
     headline : string
     improvementTags: string[]
+}
+
+interface FeedbackImprovement {
+    problem: string
+    action: string
+    example: string
 }
 
 interface FeedbackDimensions {
     structure: number
     clarity: number
     specificity: number
+}
+
+interface FeedbackJobMetrics {
+    decisionMaking: number
+    practicality: number
+    tradeoff: number
 }
 
 export interface InterviewResultResponse {
@@ -40,5 +53,6 @@ export interface InterviewResultResponse {
     improvements: string[]
     questions: InterviewQuestionFeedbackItem[]
     feedbackDimensions : FeedbackDimensions,
+    feedbackJobMetrics : FeedbackJobMetrics,
     endReason:EnumResponse
 }

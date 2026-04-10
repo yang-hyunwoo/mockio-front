@@ -89,12 +89,10 @@ export default function MyPage() {
     useEffect(() => {
 
         if (!isInitialized) {
-            console.log("return: not initialized");
             return;
         }
 
         if (!isAuth) {
-            console.log("return: not auth");
             setLoading(false);
             setProfile(null);
             setPreference(null);
@@ -110,7 +108,6 @@ export default function MyPage() {
                 setLoading(true);
 
                 const response = await MyPageApi();
-                console.log("MyPageApi response", response);
 
                 if (cancelled) return;
 

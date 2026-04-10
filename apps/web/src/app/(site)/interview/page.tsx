@@ -147,7 +147,6 @@ export default function InterviewPage() {
             }
 
             const feedbackRes = await FeedbackDetailApi(current.id)
-
             if (feedbackRes) {
                 setFeedbackByQuestionId((prev) => ({
                     ...prev,
@@ -542,8 +541,6 @@ export default function InterviewPage() {
                 : new MediaRecorder(stream)
 
             audioChunksRef.current = []
-        console.log(mimeType);
-            console.log(recorder);
 
             recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -967,7 +964,6 @@ export default function InterviewPage() {
                                     : "답변 제출"}
                         </Button>
                     </div>
-
                     {isFeedbackPending && (
                         <div className="mt-5 rounded-2xl border border-sky-500/20 bg-sky-500/5 p-5">
                             <div className="flex items-center gap-2">
@@ -1015,7 +1011,7 @@ export default function InterviewPage() {
                                 </div>
                             )}
 
-                            {!!currentFeedback.improvements.length && (
+                            {currentFeedback.improvements.length > 0 && (
                                 <div className="mt-4">
                                     <div className="flex items-center gap-2">
                                         <MessageSquareWarning className="h-4 w-4 text-amber-400" />
@@ -1023,9 +1019,13 @@ export default function InterviewPage() {
                                             보완하면 좋은 점
                                         </p>
                                     </div>
-                                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-(--brand-muted)">
+
+                                    <ul className="mt-2 list-disc space-y-3 pl-5 text-sm text-(--brand-muted)">
                                         {currentFeedback.improvements.map((item, idx) => (
-                                            <li key={idx}>{item}</li>
+                                            <li key={idx}>
+                                                <p className="text-foreground">{item.problem}</p>
+                                                <p className="mt-1 pl-3">→ {item.action}</p>
+                                            </li>
                                         ))}
                                     </ul>
                                 </div>
