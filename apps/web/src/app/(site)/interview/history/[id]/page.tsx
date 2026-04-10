@@ -449,11 +449,11 @@ export default function InterviewResultPage({
                                     <RotateCcw className="h-4 w-4" />
                                     {retryLoading ? "생성중..." : retryLabel}
                                 </button>
-                                <button
-                                    onClick={handleTest}
-                                >
-                                    버튼 클릭
-                                </button>
+                                {/*<button*/}
+                                {/*    onClick={handleTest}*/}
+                                {/*>*/}
+                                {/*    버튼 클릭*/}
+                                {/*</button>*/}
                             </div>
                         </div>
 
