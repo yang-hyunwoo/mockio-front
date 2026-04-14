@@ -40,8 +40,8 @@ export default function LoginPage() {
     }
 
     const handleGoogleLogin = () => {
-        // window.location.href = `http://localhost:9080/api/auth/v1/oauth2/authorization/google`
-        window.location.href = `https://mockio.cloud/api/auth/v1/oauth2/authorization/google`
+        window.location.href = `http://localhost:9080/api/auth/v1/oauth2/authorization/google`
+        // window.location.href = `https://mockio.cloud/api/auth/v1/oauth2/authorization/google`
     }
 
     return (

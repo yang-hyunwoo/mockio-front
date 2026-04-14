@@ -102,7 +102,6 @@ export default function MyPage() {
         let cancelled = false;
 
         const fetchMyPageData = async () => {
-            console.log("fetchMyPageData start");
 
             try {
                 setLoading(true);

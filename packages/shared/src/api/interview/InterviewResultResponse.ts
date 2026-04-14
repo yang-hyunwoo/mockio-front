@@ -54,5 +54,6 @@ export interface InterviewResultResponse {
     questions: InterviewQuestionFeedbackItem[]
     feedbackDimensions : FeedbackDimensions,
     feedbackJobMetrics : FeedbackJobMetrics,
-    endReason:EnumResponse
+    endReason:EnumResponse,
+    sourceInterviewId : number
 }

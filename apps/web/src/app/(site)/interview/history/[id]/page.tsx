@@ -3,7 +3,7 @@
 import axios from "axios"
 import { use, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import {useRouter, useSearchParams} from "next/navigation"
 import {
     ArrowLeft,
     BadgeCheck,
@@ -172,7 +172,8 @@ export default function InterviewResultPage({
     const router = useRouter()
     const resolvedParams = use(params)
     const interviewId = Number(resolvedParams.id)
-
+    const searchParams = useSearchParams()
+    const returnTo = searchParams.get("returnTo")
     const [result, setResult] = useState<InterviewResultResponse | null>(null)
     const [loading, setLoading] = useState(true)
     const [retryLoading, setRetryLoading] = useState(false)
@@ -240,8 +241,13 @@ export default function InterviewResultPage({
     const handleRetry = async () => {
         await executeRetry()
     }
-    const handleTest = async () => {
-        window.location.href="/interview/compare"
+    const handleTest = () => {
+        if (!result?.id) {
+            alert("면접 정보가 없습니다.")
+            return
+        }
+
+        router.push(`/interview/compare?interviewId=${result.id}`)
     }
 
     const handleContinueInterview = () => {
@@ -337,13 +343,25 @@ export default function InterviewResultPage({
             <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/70">
                     <div className="border-b border-black/5 px-6 py-8 dark:border-white/10 sm:px-8">
-                        <Link
-                            href="/interview/history"
-                            className="inline-flex items-center gap-2 text-sm font-medium text-(--brand-muted) transition-colors hover:text-foreground"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            면접 기록으로 돌아가기
-                        </Link>
+                        <div>
+                            {returnTo ? (
+                                <Link
+                                    href={returnTo}
+                                    className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    비교 페이지로 돌아가기
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/interview/history"
+                                    className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    면접 기록으로 돌아가기
+                                </Link>
+                            )}
+                        </div>
 
                         <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div>
@@ -371,12 +389,16 @@ export default function InterviewResultPage({
                                 </div>
                             </div>
 
+                            {/* 👉 점수 + 비교 버튼 묶기 */}
                             {result.overallScore !== null && (
-                                <div
-                                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${overallScoreMeta.className}`}
-                                >
-                                    <BadgeCheck className="h-4 w-4" />
-                                    종합 점수 {result.overallScore}점 · {overallScoreMeta.label}
+                                <div className="flex flex-col items-end gap-2">
+                                    <div
+                                        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${overallScoreMeta.className}`}
+                                    >
+                                        <BadgeCheck className="h-4 w-4" />
+                                        종합 점수 {result.overallScore}점 · {overallScoreMeta.label}
+                                    </div>
+
                                 </div>
                             )}
                         </div>
@@ -449,11 +471,7 @@ export default function InterviewResultPage({
                                     <RotateCcw className="h-4 w-4" />
                                     {retryLoading ? "생성중..." : retryLabel}
                                 </button>
-                                {/*<button*/}
-                                {/*    onClick={handleTest}*/}
-                                {/*>*/}
-                                {/*    버튼 클릭*/}
-                                {/*</button>*/}
+
                             </div>
                         </div>
 
@@ -533,6 +551,16 @@ export default function InterviewResultPage({
                                         ))}
                                     </div>
                                 )}
+                                {result.sourceInterviewId !== null && (
+                                    <div className="mt-4 flex justify-end">
+                                        <button
+                                            onClick={handleTest}
+                                            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-(--brand-primary) px-5 text-sm font-semibold text-white transition-colors hover:bg-(--brand-primary-hover) disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            이전 면접과 비교
+                                        </button>
+                                    </div>
+                                )}
                             </section>
 
                             <div className="grid gap-6">
@@ -582,6 +610,8 @@ export default function InterviewResultPage({
                                     </ul>
                                 </section>
                             </div>
+
+
                         </div>
 
                         <section className="mt-6 rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/3">

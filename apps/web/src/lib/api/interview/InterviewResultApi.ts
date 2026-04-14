@@ -12,5 +12,6 @@ export const InterviewResultApi = async (
     const response = await api.get<ApiResponse<InterviewResultResponse>>(
         `${endpoints.interview}/history/${interviewId}`
     )
+
     return response.data.data ?? null
 }
