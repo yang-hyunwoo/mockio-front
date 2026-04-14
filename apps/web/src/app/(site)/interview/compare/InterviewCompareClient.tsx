@@ -38,7 +38,7 @@ interface DimensionScore {
 interface JobMetricScore {
     practicality?: number
     decisionMaking?: number
-    tradeOff?: number
+    tradeoff?: number
 }
 
 interface FeedbackSummary {
@@ -111,8 +111,10 @@ const dimensionLabels: Record<string, string> = {
     specificity: "구체성",
     practicality: "실무 적합성",
     decisionMaking: "의사결정 기준",
-    tradeOff: "트레이드오프 이해",
+    tradeoff: "트레이드오프 이해",
 }
+const dimensionKeys = ["structure", "clarity", "specificity"]
+const jobMetricKeys = ["practicality", "decisionMaking", "tradeoff"]
 
 function getDelta(current: number, previous: number) {
     return current - previous
@@ -799,11 +801,24 @@ export default function InterviewComparePage() {
                     </CardHeader>
                     <CardContent className="space-y-5">
                         {Object.entries(dimensionLabels).map(([key, label]) => {
-                            const previous = previousInterview.dimensions[key as keyof DimensionScore] ?? 0
-                            const current = currentInterview.dimensions[key as keyof DimensionScore] ?? 0
+                            let previous = 0
+                            let current = 0
+
+                            if (dimensionKeys.includes(key)) {
+                                previous = previousInterview.dimensions[key as keyof DimensionScore] ?? 0
+                                current = currentInterview.dimensions[key as keyof DimensionScore] ?? 0
+                            } else if (jobMetricKeys.includes(key)) {
+                                previous = previousInterview.jobMetrics[key as keyof JobMetricScore] ?? 0
+                                current = currentInterview.jobMetrics[key as keyof JobMetricScore] ?? 0
+                            }
 
                             return (
-                                <ScoreRow key={key} label={label} previous={previous} current={current} />
+                                <ScoreRow
+                                    key={key}
+                                    label={label}
+                                    previous={previous}
+                                    current={current}
+                                />
                             )
                         })}
                     </CardContent>
