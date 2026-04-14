@@ -169,7 +169,7 @@ export default function InterviewResultPage({
                                             }: {
     params: Promise<{ id: string }>
 }) {
-    const router = useRouter()
+    const router = useRouter()    
     const resolvedParams = use(params)
     const interviewId = Number(resolvedParams.id)
     const searchParams = useSearchParams()
