@@ -326,8 +326,9 @@ export default function QuestionBoardForm({ mode, boardId }: Props) {
                     title,
                     content,
                 };
-                await interviewQuestionAnswerSaveApi(payload);
+                const interviewQuestionAnserSaveResponse = await interviewQuestionAnswerSaveApi(payload);
                 alert("게시글이 등록되었습니다.");
+                router.push(`/questionboard/detail/${interviewQuestionAnserSaveResponse.id}`);
             } else {
 
                 if (!boardId || Number.isNaN(boardId)) {
@@ -345,8 +346,10 @@ export default function QuestionBoardForm({ mode, boardId }: Props) {
                 }
                 await interviewQuestionAnswerUpdateApi(payload);
                 alert("게시글이 수정되었습니다.");
+                router.push(`/questionboard/detail/${boardId}`);
             }
-            router.push(`/questionboard/detail/${boardId}`);
+
+
         } catch (error) {
             console.error(
                 mode === "create" ? "게시글 등록 실패" : "게시글 수정 실패",

@@ -15,14 +15,20 @@ type InterviewQuestionAnswerRequest = {
     content: string;
 };
 
+export type interviewQuestionAnserSaveResponse = {
+    id : number;
+}
 
 export const interviewQuestionAnswerSaveApi = async (
     payload: InterviewQuestionAnswerRequest
-): Promise<void> => {
+): Promise<interviewQuestionAnserSaveResponse> => {
     const endpoints = getClientApiEndpoints();
 
-    await api.post(
+    const result = await api.post(
         `${endpoints.questionboard}/create`,
         payload
     );
+
+    return result.data.data;
+
 };
