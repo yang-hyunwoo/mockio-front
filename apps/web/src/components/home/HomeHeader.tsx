@@ -114,6 +114,12 @@ export default function HomeHeader() {
                         >
                             FAQ
                         </Link>
+                        <Link
+                            href="/questionboard/list"
+                            className="text-(--brand-muted) transition-colors hover:text-foreground"
+                        >
+                            면접 질문 공유
+                        </Link>
 
                         {isInitialized && isLogin && (
                             <>
@@ -282,6 +288,14 @@ export default function HomeHeader() {
                                     className="block rounded-2xl px-4 py-3 text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
                                 >
                                     FAQ
+                                </Link>
+
+                                <Link
+                                    href="/questionboard/list"
+                                    onClick={closeMobileMenu}
+                                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-foreground transition hover:bg-black/5 dark:hover:bg-white/5"
+                                >
+                                    면접 질문 공유
                                 </Link>
 
                                 {isInitialized && isLogin && (

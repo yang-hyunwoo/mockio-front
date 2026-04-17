@@ -18,6 +18,8 @@ const createEndpoints = (baseUrl: string) => ({
   inquiry: `${baseUrl}/inquiry/${version}`,
   faq: `${baseUrl}/faq/${version}`,
   interview: `${baseUrl}/interview/${version}`,
+  questionboard: `${baseUrl}/questionboard/${version}`,
+  comment: `${baseUrl}/comment/${version}`,
 
   userPublic: `${baseUrl}/users/${version}/public`,
   notificationPublic: `${baseUrl}/notification/${version}/public`,
@@ -26,7 +28,9 @@ const createEndpoints = (baseUrl: string) => ({
   notiPublic: `${baseUrl}/notice/${version}/public`,
   faqPublic: `${baseUrl}/faq/${version}/public`,
   authPublic: `${baseUrl}/auth/${version}/public`,
-});      
+  questionboardPublic: `${baseUrl}/questionboard/${version}/public`,
+  commentPublic: `${baseUrl}/comment/${version}/public`,
+});
 
 export const getClientApiBaseUrl = () =>
     normalizeBaseUrl(process.env.NEXT_PUBLIC_API_URL);

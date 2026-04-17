@@ -94,9 +94,9 @@ export const TRACK: { value: Track; label: string }[] = [
 
 export const TRACKALL: { value: TrackAll; label: string }[] = [
     { value: "ALL", label: "전체" },
-    { value: "BACKEND_ENGINEER", label: "백엔드" },
-    { value: "FRONTEND_ENGINEER", label: "프론트엔드" },
-    { value: "SERVER_ENGINEER", label: "서버" },
+    { value: "BACKEND_ENGINEER", label: "백엔드 엔지니어" },
+    { value: "FRONTEND_ENGINEER", label: "프론트엔드 엔지니어" },
+    { value: "SERVER_ENGINEER", label: "서버 엔지니어" },
     { value: "DATA_ENGINEER", label: "데이터 분석가" },
     { value: "DESIGN", label: "그래픽" },
     { value: "PRODUCT", label: "PM" },

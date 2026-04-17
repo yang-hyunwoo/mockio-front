@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/axios";
-import {getClientApiEndpoints} from "@mockio/shared/src/api";
+import { getClientApiEndpoints } from "@mockio/shared/src/api";
 
-const EXCLUDED_PATHS = ["/login", "/social/callback", "/signup","/password/reset","/password"];
+const EXCLUDED_PATHS = ["/login", "/social/callback", "/signup", "/password/reset", "/password"];
 const endpoints = getClientApiEndpoints();
 
 export default function AuthInitializer({
@@ -19,12 +19,13 @@ export default function AuthInitializer({
     const setUser = useAuthStore((s) => s.setUser);
     const setInitialized = useAuthStore((s) => s.setInitialized);
     const clearAuth = useAuthStore((s) => s.clearAuth);
+    const isInitialized = useAuthStore((s) => s.isInitialized);
+
+    const isExcludedPath = EXCLUDED_PATHS.some((path) =>
+        pathname.startsWith(path)
+    );
 
     useEffect(() => {
-        const isExcludedPath = EXCLUDED_PATHS.some((path) =>
-            pathname.startsWith(path)
-        );
-
         if (isExcludedPath) {
             setInitialized(true);
             return;
@@ -73,8 +74,12 @@ export default function AuthInitializer({
             }
         };
 
-        initAuth();
-    }, [pathname, setAccessToken, setUser, setInitialized, clearAuth]);
+        void initAuth();
+    }, [pathname, isExcludedPath, setAccessToken, setUser, setInitialized, clearAuth]);
+
+    if (!isExcludedPath && !isInitialized) {
+        return null;
+    }
 
     return <>{children}</>;
 }

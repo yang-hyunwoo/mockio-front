@@ -338,6 +338,8 @@ export default function InterviewResultPage({
         ? "중도 종료된 면접을 같은 조건으로 다시 시작할 수 있습니다."
         : "같은 조건으로 새 면접을 시작해 성장 변화를 다시 확인해보세요."
 
+
+
     return (
         <>
             <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -624,6 +626,14 @@ export default function InterviewResultPage({
                                 {result.questions.map((item, index) => {
                                     const scoreMeta = getScoreMeta(item.score ?? 0)
                                     const isOpen = openQuestionIds.includes(item.id)
+                                    const canShare =
+                                        result.status.code === "ENDED" && result.endReason.code === "COMPLETED";
+
+                                    const handleMoveShare = (questionId: number) => {
+                                        router.push(
+                                            `/questionboard/create?interviewId=${result.sourceInterviewId ?? result.id}&questionId=${questionId}`
+                                        );
+                                    };
 
                                     return (
                                         <article
@@ -632,25 +642,37 @@ export default function InterviewResultPage({
                                         >
                                             <div className="flex flex-col gap-4">
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        <span className="inline-flex items-center rounded-full bg-[var(--brand-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--brand-primary)]">
-                                                            Q{index + 1}
-                                                        </span>
-
-                                                        <span
-                                                            className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${getQuestionTypeStyle(
-                                                                item.type.code
-                                                            )}`}
-                                                        >
-                                                            {getQuestionTypeLabel(item.type.code)}
-                                                        </span>
-
-                                                        {item.score !== null && (
-                                                            <span
-                                                                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${scoreMeta.className}`}
-                                                            >
-                                                                {item.score}점 · {scoreMeta.label}
+                                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <span className="inline-flex items-center rounded-full bg-[var(--brand-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--brand-primary)]">
+                                                                Q{index + 1}
                                                             </span>
+
+                                                            <span
+                                                                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${getQuestionTypeStyle(
+                                                                    item.type.code
+                                                                )}`}
+                                                            >
+                                                                {getQuestionTypeLabel(item.type.code)}
+                                                            </span>
+
+                                                            {item.score !== null && (
+                                                                <span
+                                                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${scoreMeta.className}`}
+                                                                >
+                                                                    {item.score}점 · {scoreMeta.label}
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        {canShare && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleMoveShare(item.id)}
+                                                                className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                                                            >
+                                                                공유하기
+                                                            </button>
                                                         )}
                                                     </div>
 
